@@ -1,0 +1,391 @@
+/*
+  FABWEB Cybersecurity Services — styles.css
+  VISUAL STYLESHEET: colours, typography, borders, backgrounds and effects.
+*/
+
+/* =========================================================
+   1. GENERAL
+   ========================================================= */
+:root {
+    --navy: #0B1F33;
+    --navy-2: #102B47;
+    --blue: #1677FF;
+    --cyan: #22D3EE;
+    --teal: #14B8A6;
+    --light: #F4F8FB;
+    --white: #FFFFFF;
+    --text: #17212B;
+    --muted: #52606D;
+    --border: #CBD5E1;
+    --focus: #FFBF47;
+    --shadow: 0 12px 30px rgba(11, 31, 51, 0.12);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.65;
+    color: var(--text);
+    background: var(--white);
+}
+
+a {
+    color: #005FCC;
+    text-underline-offset: 0.2em;
+}
+
+a:hover {
+    text-decoration-thickness: 2px;
+}
+
+.site-header {
+    background: var(--navy);
+    color: var(--white);
+    border-bottom: 4px solid var(--cyan);
+}
+
+.brand {
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.brand-text {
+    line-height: 1.15;
+}
+
+.brand-text small {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: #D9EDF8;
+}
+
+.primary-nav ul {
+    list-style: none;
+}
+
+.primary-nav a {
+    border-radius: 0.45rem;
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.primary-nav a:hover,
+.primary-nav a[aria-current="page"] {
+    background: var(--white);
+    color: var(--navy);
+}
+
+.section.alt {
+    background: var(--light);
+}
+
+.section-heading h2,
+.section h2 {
+    color: var(--navy);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    line-height: 1.2;
+}
+
+.eyebrow {
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cyan);
+}
+
+.page-banner {
+    background: linear-gradient(135deg, var(--navy), var(--navy-2));
+    color: var(--white);
+}
+
+.page-banner h1 {
+    line-height: 1.08;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+}
+
+.page-banner p {
+    color: #E7F3FA;
+}
+
+.button {
+    border: 2px solid var(--blue);
+    border-radius: 0.5rem;
+    background: var(--blue);
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.button:hover {
+    background: #0D5FCF;
+    border-color: #0D5FCF;
+}
+
+.button.secondary {
+    background: transparent;
+    border-color: var(--cyan);
+    color: var(--white);
+}
+
+.button.secondary:hover {
+    background: rgba(34, 211, 238, 0.12);
+}
+
+.card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    box-shadow: 0 6px 18px rgba(11, 31, 51, 0.06);
+}
+
+.card h3 {
+    color: var(--navy);
+}
+
+.table-wrap {
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+}
+
+table {
+    border-collapse: collapse;
+    background: var(--white);
+}
+
+caption {
+    font-weight: 700;
+    text-align: left;
+    color: var(--navy);
+}
+
+th,
+td {
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    background: #EAF2F8;
+    color: var(--navy);
+}
+
+tr:last-child td {
+    border-bottom: 0;
+}
+
+.site-footer {
+    background: #071625;
+    color: #E5EEF6;
+}
+
+.site-footer h2,
+.site-footer h3 {
+    color: var(--white);
+}
+
+.site-footer a {
+    color: #8BE9F7;
+}
+
+.footer-note {
+    border-top: 1px solid #2C4155;
+    color: #C6D5E2;
+    font-size: 0.92rem;
+}
+
+/* =========================================================
+   2. INDEX.HTML ONLY
+   ========================================================= */
+.hero {
+    background:
+        radial-gradient(circle at 85% 20%, rgba(34, 211, 238, 0.22), transparent 32%),
+        linear-gradient(135deg, #0B1F33 0%, #102B47 50%, #0B1F33 100%);
+    color: var(--white);
+}
+
+.hero::before,
+.hero::after {
+    content: "";
+    border: 1px solid rgba(34, 211, 238, 0.28);
+    border-radius: 50%;
+}
+
+.hero h1 {
+    line-height: 1.08;
+    font-size: clamp(2.4rem, 6vw, 4.8rem);
+}
+
+.hero p {
+    font-size: 1.12rem;
+    color: #E7F3FA;
+}
+
+.stat {
+    border-left: 4px solid var(--cyan);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.stat strong {
+    font-size: 1.5rem;
+    color: var(--white);
+}
+
+.acknowledgement {
+    border-left: 5px solid var(--teal);
+    background: #EEFBF8;
+    border-radius: 0.5rem;
+}
+
+.acknowledgement h2 {
+    font-size: 1.55rem;
+}
+
+/* =========================================================
+   3. JOBS.HTML ONLY
+   ========================================================= */
+
+
+/* =========================================================
+   4. APPLY.HTML ONLY
+   ========================================================= */
+.form-intro {
+    background: #EEF5FB;
+    border-left: 4px solid var(--blue);
+}
+
+label,
+legend {
+    font-weight: 700;
+    color: var(--navy);
+}
+
+input,
+select,
+textarea {
+    border: 1px solid #8898AA;
+    border-radius: 0.4rem;
+    background: var(--white);
+    color: var(--text);
+    font: inherit;
+}
+
+fieldset {
+    border: 1px solid var(--border);
+    border-radius: 0.55rem;
+}
+
+.choice {
+    font-weight: 400;
+    color: var(--text);
+}
+
+.help-text {
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.required-note {
+    color: #8B1E1E;
+    font-weight: 700;
+}
+
+input[type="submit"],
+input[type="reset"] {
+    border-radius: 0.45rem;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+input[type="submit"] {
+    border: 2px solid var(--blue);
+    background: var(--blue);
+    color: var(--white);
+}
+
+input[type="reset"] {
+    border: 2px solid var(--navy);
+    background: var(--white);
+    color: var(--navy);
+}
+
+input[type="submit"]:hover {
+    background: #0D5FCF;
+}
+
+input[type="reset"]:hover {
+    background: #EEF5FB;
+}
+
+/* =========================================================
+   5. ABOUT.HTML ONLY
+   ========================================================= */
+
+.team-figure {
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    background: var(--white);
+}
+
+.team-figure figcaption {
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+.definition-list dt {
+    font-weight: 700;
+    color: var(--navy);
+}
+
+.student-id {
+    background: #E8F2FF;
+    border: 1px solid #AFCFFF;
+    color: #093C7D;
+    border-radius: 0.35rem;
+    font-family: "Courier New", Courier, monospace;
+    font-weight: 700;
+    transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.student-id:hover {
+    transform: translateY(-1px);
+    background: #D7E9FF;
+}
+
+blockquote {
+    border-left: 4px solid var(--cyan);
+    background: var(--light);
+}
+
+blockquote footer {
+    color: var(--muted);
+}
+
+:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+}
+
+.skip-link {
+    background: var(--white);
+    color: var(--navy);
+    border: 2px solid var(--navy);
+    border-radius: 0.35rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        transition: none !important;
+    }
+}

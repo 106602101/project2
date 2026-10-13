@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Apply for a cybersecurity role at FABWEB Cybersecurity Services.">
+  <title>Apply | FABWEB Cybersecurity Services</title>
+  <link rel="stylesheet" href="styles/styles.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <style>
+    
+    .form-shell h2 {
+      border-left: 5px solid #1677FF;
+      padding-left: 0.75rem;
+    }
+  </style>
+</head>
+
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="index.html" aria-label="FABWEB Cybersecurity Services home">
+        <img src="assets/logo.svg" alt="FABWEB shield logo">
+        <span class="brand-text">FABWEB <small>Cybersecurity Services</small></span>
+      </a>
+
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="jobs.html">Jobs</a></li>
+          <li><a href="apply.html" aria-current="page">Apply</a></li>
+          <li><a href="about.html">About Our Team</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="page-banner">
+      <div class="container">
+        <p class="eyebrow" style="letter-spacing: 0.1em;">Career Application</p>
+        <h1>Apply to Join FABWEB</h1>
+        <p>Complete the form below using the six-character reference from the position description.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container form-shell">
+        <div class="form-intro">
+          <h2>Application Form</h2>
+          <p><span class="required-note">Required:</span> all fields except Other Skills must be completed.</p>
+        </div>
+
+        <form class="application-form" method="post" action="https://mercury.swin.edu.au/it000000/formtest.php">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label for="jobref">Job Reference Number <span aria-hidden="true">*</span></label>
+              <input id="jobref" name="jobref" type="text" required maxlength="6" pattern="[A-Za-z0-9]{6}"
+                placeholder="e.g. FW1001" aria-describedby="jobref-help">
+              <p class="help-text" id="jobref-help">Exactly six alphanumeric characters. Valid FABWEB references are
+                FW1001, FW1002, FW1003 and FW1004.</p>
+            </div>
+
+            <div class="form-group">
+              <label for="firstname">First Name <span aria-hidden="true">*</span></label>
+              <input id="firstname" name="firstname" type="text" required maxlength="20" pattern="[A-Za-z]{1,20}"
+                autocomplete="given-name" title="Use alphabetic characters only, maximum 20 characters.">
+            </div>
+
+            <div class="form-group">
+              <label for="lastname">Last Name <span aria-hidden="true">*</span></label>
+              <input id="lastname" name="lastname" type="text" required maxlength="20" pattern="[A-Za-z]{1,20}"
+                autocomplete="family-name" title="Use alphabetic characters only, maximum 20 characters.">
+            </div>
+
+            <div class="form-group">
+              <label for="dob">Date of Birth <span aria-hidden="true">*</span></label>
+              <input id="dob" name="dob" type="text" required placeholder="dd/mm/yyyy"
+                pattern="(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/[0-9]{4}" aria-describedby="dob-help">
+              <p class="help-text" id="dob-help">Enter the date in dd/mm/yyyy format.</p>
+            </div>
+
+            <fieldset class="form-group">
+              <legend>Gender <span aria-hidden="true">*</span></legend>
+              <div class="radio-group">
+                <label class="choice"><input type="radio" name="gender" value="female" required> Female</label>
+                <label class="choice"><input type="radio" name="gender" value="male"> Male</label>
+                <label class="choice"><input type="radio" name="gender" value="other"> Another Identity</label>
+              </div>
+            </fieldset>
+
+            <div class="form-group full">
+              <label for="street">Street Address <span aria-hidden="true">*</span></label>
+              <input id="street" name="street" type="text" required maxlength="40" autocomplete="street-address">
+            </div>
+
+            <div class="form-group">
+              <label for="suburb">Suburb/Town <span aria-hidden="true">*</span></label>
+              <input id="suburb" name="suburb" type="text" required maxlength="40" autocomplete="address-level2">
+            </div>
+
+            <div class="form-group">
+              <label for="state">State/Territory <span aria-hidden="true">*</span></label>
+              <select id="state" name="state" required autocomplete="address-level1">
+                <option value="">Select state or territory</option>
+                <option value="VIC">VIC</option>
+                <option value="NSW">NSW</option>
+                <option value="QLD">QLD</option>
+                <option value="NT">NT</option>
+                <option value="WA">WA</option>
+                <option value="SA">SA</option>
+                <option value="TAS">TAS</option>
+                <option value="ACT">ACT</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="postcode">Postcode <span aria-hidden="true">*</span></label>
+              <input id="postcode" name="postcode" type="text" required maxlength="4" pattern="[0-9]{4}"
+                inputmode="numeric" autocomplete="postal-code" title="Enter exactly four digits.">
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email <span aria-hidden="true">*</span></label>
+              <input id="email" name="email" type="email" required autocomplete="email">
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number <span aria-hidden="true">*</span></label>
+              <input id="phone" name="phone" type="tel" required pattern="[0-9]{8,12}" inputmode="numeric"
+                autocomplete="tel" aria-describedby="phone-help">
+              <p class="help-text" id="phone-help">Enter 8–12 digits with no spaces.</p>
+            </div>
+            <fieldset class="form-group full">
+              <legend>Skill List <span aria-hidden="true">*</span></legend>
+              <p class="help-text">Select the skills that apply to you. Cybersecurity Fundamentals is required for this
+                HTML-only demonstration.</p>
+              <div class="checkbox-grid">
+                <label class="choice"><input type="checkbox" name="skills[]" value="cybersecurity-fundamentals"
+                    required> Cybersecurity Fundamentals</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="network-security"> Network
+                  Security</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="incident-response"> Incident
+                  Response</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="siem"> SIEM / Security
+                  Monitoring</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="web-security"> Web Security</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="penetration-testing"> Penetration
+                  Testing</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="cloud-security"> Cloud
+                  Security</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="linux"> Linux</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="scripting"> Python /
+                  Scripting</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="risk-management"> Risk
+                  Management</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="security-awareness"> Security
+                  Awareness</label>
+                <label class="choice"><input type="checkbox" name="skills[]" value="technical-documentation"> Technical
+                  Documentation</label>
+              </div>
+            </fieldset>
+
+            <div class="form-group full">
+              <label for="other-skills">Other Skills</label>
+              <textarea id="other-skills" name="other_skills"
+                placeholder="List any other relevant skills, certifications or experience."></textarea>
+            </div>
+          </div>
+          <div class="submit-row">
+            <input type="submit" value="Submit Application">
+            <input type="reset" value="Clear Form">
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <section>
+          <h2>FABWEB Cybersecurity Services</h2>
+          <p>Secure the Web. Protect What Matters.</p>
+          <p>Melbourne, Victoria, Australia</p>
+        </section>
+
+        <section>
+          <h3>Contact</h3>
+          <ul>
+            <li><a href="mailto:careers@fabweb.com.au">careers@fabweb.com.au</a></li>
+            <li><a href="mailto:info@fabweb.com.au">info@fabweb.com.au</a></li>
+          </ul>
+        </section>
+
+        <section>
+          <h3>Project Links</h3>
+          <ul>
+            <li><a href="https://github.com/RShashimalKarunasinghe/Applied-Web-Project.git" target="_blank" rel="noopener">GitHub Repository</a></li>
+            </li>
+          </ul>
+        </section>
+      </div>
+
+      <p class="footer-note">FABWEB Cybersecurity Services is a fictional company created for the COS10026 Applied Web
+        Project. Replace the GitHub and Jira links with your team's actual project URLs before submission.</p>
+    </div>
+  </footer>
+</body>
+
+</html>

@@ -1,8 +1,6 @@
 
 <?php
-declare(strict_types=1);
 
-// Block requests that do not submit the application form.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' ||
     !isset($_POST['jobref'], $_POST['firstname'],
              $_POST['lastname'], $_POST['dob'])) {

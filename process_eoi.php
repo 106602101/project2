@@ -119,7 +119,9 @@ if (!is_valid_email($raw['email'])) {
     $errors[] = 'Please enter a valid email address.';
 }
 
-
+if (!is_valid_phone($raw['phone'])) {
+    $errors[] = 'Phone number must contain 8-12 digits or spaces.';
+}
 
 
 // Job reference: exactly 6 alphanumeric characters.

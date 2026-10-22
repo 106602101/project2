@@ -111,6 +111,9 @@ if (!$postcodeOk) {
     $errors[] = 'Postcode must contain exactly 4 digits.';
 }
 
+if ($stateOk && $postcodeOk && !postcode_matches_state($raw['postcode'], $raw['state'])) {
+    $errors[] = 'Postcode does not match the selected state.';
+}
 
 
 

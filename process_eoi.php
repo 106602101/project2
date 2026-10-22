@@ -19,18 +19,18 @@ function post_string($key) {
 
 // ----------- Collect raw values -------------
 $raw = [
-    'jobref'      => strtoupper(input('jobref')),
-    'firstname'   => input('firstname'),
-    'lastname'    => input('lastname'),
-    'dob'         => input('dob'),
-    'gender'      => input('gender'),
-    'street'      => input('street'),
-    'suburb'      => input('suburb'),
-    'state'       => input('state'),
-    'postcode'    => input('postcode'),
-    'email'       => input('email'),
-    'phone'       => input('phone'),
-    'other_skills'=> input('other_skills')
+    'jobref'      => strtoupper(post_string('jobref')),
+    'firstname'   => post_string('firstname'),
+    'lastname'    => post_string('lastname'),
+    'dob'         => post_string('dob'),
+    'gender'      => post_string('gender'),
+    'street'      => post_string('street'),
+    'suburb'      => post_string('suburb'),
+    'state'       => post_string('state'),
+    'postcode'    => post_string('postcode'),
+    'email'       => post_string('email'),
+    'phone'       => post_string('phone'),
+    'other_skills'=> post_string('other_skills')
 ];
 
 $errors        = [];
@@ -44,7 +44,7 @@ require_once __DIR__ . '/settings.php';
 
 try {
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQL_REPORT_STRICT);
-    $conn = new msqli($host, $user, $pwd, $sql_db);
+    $conn = new mysqli($host, $user, $pwd, $sql_db);
     $conn->set_charset('utf8mb4');
 
     $result = $conn->query("SELECT jobref FROM jobs");

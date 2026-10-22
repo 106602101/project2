@@ -130,6 +130,20 @@ $allowedSkills = [
     'technical-documentation'
 ];
 
+$submittedSkills = $_POST['skills'] ?? [];
+if (!is_array($submittedSkills)) {
+    $errors[] = 'Invalid skills format.';
+    $submittedSkills = [];
+}
+
+$skillsAllValid = true;
+foreach ($submittedSkills as $skill) {
+    if (!is_in_list($skill, $allowedSkills)) {
+        $skillsAllValid = false;
+        break;
+    }
+}
+
 // Job reference: exactly 6 alphanumeric characters.
 if (!preg_match('/^[A-Z0-9]{6}$/D', $data['jobref'])) {
     $errors[] = 'Job reference must have 6 letters or numbers.';

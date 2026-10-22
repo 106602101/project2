@@ -57,8 +57,12 @@ try {
     $databaseError = true;
 }
 
-
-
+// ----------------------- Validation -----------------------------
+if (!is_valid_job_ref($raw['jobref'])) {
+    $errors[] = 'Job reference must have 6 letters or numbers.';
+} elseif (!is_in_list($raw['jobref'], $validJobs)) {
+    $errors[] = 'Please enter a valid FABWEB job reference.';
+}
 
 
 // Job reference: exactly 6 alphanumeric characters.

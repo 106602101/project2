@@ -47,8 +47,11 @@ function is_in_list($value, $allowed) {
     return in_array(trim($value), $allowed, true);
 }
 
-function is_valid_postcode() {
-
+function is_valid_postcode($postcode) {
+    if (!is_string($postcode)) {
+        return false;
+    }
+    return preg_match("/^\d{4}$/", trim($postcode)) === 1;
 }
 
 function is_valid_email() {

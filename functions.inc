@@ -40,8 +40,11 @@ function is_valid_date($date) {
     return checkdate((int) $parts[2], (int) $parts[1], (int) $parts[3]);
 }
 
-function is_in_list() {
-    
+function is_in_list($value, $allowed) {
+    if (!is_string($value)) {
+        return false;
+    }
+    return in_array(trim($value), $allowed, true);
 }
 
 function is_valid_postcode() {

@@ -153,6 +153,9 @@ if (empty($submittedSkills)) {
     $errors[] = 'Cybersecurity Fundamentals is required.';
 }
 
+if (mb_strlen($raw['other_skills'], 'UTF-8') > 5000) {
+    $errors[] = 'Other skills must be under 5000 characters.';
+}
 
 // PREVIOUS CODE
 

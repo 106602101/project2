@@ -106,7 +106,10 @@ if (!$stateOk) {
     $errors[] = 'Please select a valid state or territory.';
 }
 
-
+$postcodeOk = is_valid_postcode($raw['postcode']);
+if (!$postcodeOk) {
+    $errors[] = 'Postcode must contain exactly 4 digits.';
+}
 
 
 

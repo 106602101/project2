@@ -144,6 +144,18 @@ foreach ($submittedSkills as $skill) {
     }
 }
 
+if (empty($submittedSkills)) {
+    $errors[] = 'Please select at least one skill.';
+} elseif (!$skillsAllValid) {
+    $errors[] = 'An invalid skill was selected.';
+} elseif (!in_array('cybersecurity-fundamentals', $submittedSkills, true)) {
+    // Required checkbox carried over from Part 1.
+    $errors[] = 'Cybersecurity Fundamentals is required.';
+}
+
+
+// PREVIOUS CODE
+
 // Job reference: exactly 6 alphanumeric characters.
 if (!preg_match('/^[A-Z0-9]{6}$/D', $data['jobref'])) {
     $errors[] = 'Job reference must have 6 letters or numbers.';
@@ -156,6 +168,8 @@ if (preg_match('/^[A-Z0-9]{6}$/D', $data['jobref']) &&
     !in_array($data['jobref'], $validJobs, true)) {
     $errors[] = 'Please enter a valid FABWEB job reference.';
 }
+
+
 
 // First and last names.
 foreach (['firstname' => 'First name',

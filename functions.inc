@@ -13,8 +13,8 @@ function sanitise($input) {
 
 // Validators 
 
-function is_valid_job_ref() {
-
+function is_valid_job_ref($ref_number) {
+    return preg_match('/^[A-Z0-9]{6}$/D', $ref_number);
 }
 
 function is_valid_name($name, $max_length = 20) {
@@ -24,7 +24,7 @@ function is_valid_name($name, $max_length = 20) {
 }
 
 function is_valid_date() {
-    
+
 }
 
 function is_in_list() {

@@ -64,6 +64,17 @@ if (!is_valid_job_ref($raw['jobref'])) {
     $errors[] = 'Please enter a valid FABWEB job reference.';
 }
 
+if (!is_valid_name($raw['firstname'], 20)) {
+    $errors[] = 'First name must contain 1-20 letters only.';
+}
+if (!is_valid_name($raw['lastname'], 20)) {
+    $errors[] = 'Last name must contain 1-20 letters only.';
+}
+
+
+
+
+
 
 // Job reference: exactly 6 alphanumeric characters.
 if (!preg_match('/^[A-Z0-9]{6}$/D', $data['jobref'])) {

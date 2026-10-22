@@ -88,6 +88,29 @@ if (!is_valid_date($raw['dob'])) {
     }
 }
 
+if (!is_in_list($raw['gender'], ['female', 'male', 'other'])) {
+    $errors[] = 'Please select a valid gender option.';
+}
+
+foreach (['street' => 'Street address', 'suburb' => 'Suburb/town'] as $field => $label) {
+    $length = mb_strlen($raw[$field], 'UTF-8');
+    if ($length < 1 || $length > 40) {
+        $errors[] = "$label must contain 1-40 characters.";
+    }
+}
+
+
+$validStates = ['VIC', 'NSW', 'QLD', 'NT', 'WA', 'SA', 'TAS', 'ACT'];
+$stateOk = is_in_list($raw['state'], $validStates);
+if (!$stateOk) {
+    $errors[] = 'Please select a valid state or territory.';
+}
+
+
+
+
+
+
 
 
 // Job reference: exactly 6 alphanumeric characters.

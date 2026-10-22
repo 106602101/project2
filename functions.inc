@@ -63,8 +63,11 @@ function is_valid_email($email) {
         && filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
-function is_valid_phone() {
-
+function is_valid_phone($phone) {
+    if (!is_string($phone)) {
+        return false;
+    }
+    return preg_match("/^[0-9 ]{8,12}$/", trim($phone)) === 1;
 }
 
 // INTERNAL HELPERS: Used only by functions above.

@@ -54,6 +54,18 @@ function is_valid_postcode($postcode) {
     return preg_match("/^\d{4}$/", trim($postcode)) === 1;
 }
 
+function postcode_matches_state($postcode, $state) {
+    $first_digits = [
+        'VIC' => ['3', '8'], 'NSW' => ['1', '2'], 'QLD' => ['4', '9'],
+        'NT'  => ['0'],      'ACT' => ['0'],      'WA'  => ['6'],
+        'SA'  => ['5'],      'TAS' => ['7']
+    ];
+    if (!is_string($postcode) || !isset($first_digits[$state])) {
+        return false;
+    }
+    return in_array(substr(trim($postcode), 0, 1), $first_digits[$state], true);
+}
+
 function is_valid_email($email) {
     if (!is_string($email)) {
         return false;

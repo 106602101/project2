@@ -17,8 +17,10 @@ function is_valid_job_ref() {
 
 }
 
-function is_valid_name() {
-
+function is_valid_name($name, $max_length = 20) {
+    $name = trim($name);
+    return preg_match("/^[A-Za-z' -]+$/", $name) === 1
+        && strlen($name) <= $max_length;
 }
 
 function is_valid_date() {

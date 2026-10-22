@@ -54,8 +54,13 @@ function is_valid_postcode($postcode) {
     return preg_match("/^\d{4}$/", trim($postcode)) === 1;
 }
 
-function is_valid_email() {
-
+function is_valid_email($email) {
+    if (!is_string($email)) {
+        return false;
+    }
+    $email = trim($email);
+    return strlen($email) <= 254
+        && filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 }
 
 function is_valid_phone() {

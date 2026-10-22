@@ -1,6 +1,6 @@
-
 <?php
 
+// Blocks direct access, ensures POST request has core fields.
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' ||
     !isset($_POST['jobref'], $_POST['firstname'],
              $_POST['lastname'], $_POST['dob'])) {
@@ -10,29 +10,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' ||
 
 $pageTitle = 'Application Result | FABWEB';
 
-// Clean incoming text. Escape it when displaying in HTML.
-function cleanInput($value): string {
-    if (!is_string($value)) {
-        return '';
-    }
 
-    return trim(strip_tags(stripslashes($value)));
-}
-
-function escapeHtml(string $value): string {
-    return htmlspecialchars(
-        $value,
-        ENT_QUOTES | ENT_SUBSTITUTE,
-        'UTF-8'
-    );
-}
-
-function input(string $key): string {
-    return cleanInput($_POST[$key] ?? '');
-}
-
-// Collect submitted fields.
-$data = [
+// ----------- Collect raw values -------------
+$raw = [
     'jobref'      => strtoupper(input('jobref')),
     'firstname'   => input('firstname'),
     'lastname'    => input('lastname'),
@@ -47,7 +27,11 @@ $data = [
     'other_skills'=> input('other_skills')
 ];
 
-$errors = [];
+$errors        = [];
+$eoiNumber     = null;
+$databaseError = false;
+$conn          = null;
+$validJobs     = [];
 
 // Job reference: exactly 6 alphanumeric characters.
 if (!preg_match('/^[A-Z0-9]{6}$/D', $data['jobref'])) {

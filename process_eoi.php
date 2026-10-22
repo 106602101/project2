@@ -10,6 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' ||
 
 $pageTitle = 'Application Result | FABWEB';
 
+// protects against potentially malicious input
+function post_string($key) {
+    $value = $_POST[$key] ?? '';
+    return is_string($value) ? trim($value) : '';
+}
+
 
 // ----------- Collect raw values -------------
 $raw = [
@@ -32,6 +38,24 @@ $eoiNumber     = null;
 $databaseError = false;
 $conn          = null;
 $validJobs     = [];
+
+// --------- Load valid job references from jobs table -----------
+require_once __DIR__ . '/settings.php';
+
+try {
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQL_REPORT_STRICT);
+    $conn = new msqli($host, $user, $pwd, $sql_db);
+    $conn->set_charset('utf8mb4');
+
+    $result = $conn->query("SELECT jobref FROM jobs");
+    while ($row = $result->fetch_assoc()) {
+        $validJobs[] = $row['jobref'];
+    }
+    $result->free();
+}
+
+
+
 
 // Job reference: exactly 6 alphanumeric characters.
 if (!preg_match('/^[A-Z0-9]{6}$/D', $data['jobref'])) {

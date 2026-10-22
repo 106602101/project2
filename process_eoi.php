@@ -52,7 +52,11 @@ try {
         $validJobs[] = $row['jobref'];
     }
     $result->free();
+    } catch (mysqli_sql_exception $exception) {
+    error_log('FABWEB database error: ' . $exception->getMessage());
+    $databaseError = true;
 }
+
 
 
 

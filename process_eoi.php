@@ -71,8 +71,22 @@ if (!is_valid_name($raw['lastname'], 20)) {
     $errors[] = 'Last name must contain 1-20 letters only.';
 }
 
+$dobForDatabase = null;
+if (!is_valid_date($raw['dob'])) {
+    $errors[] = 'Date of birth must be a real date in dd/mm/yyyy format.';
+} else {
+    $dob   = DateTimeImmutable::createFromFormat('!d/m/Y', $raw['dob']);
+    $today = new DateTimeImmutable('today');
+    $age   = $dob->diff($today)->y;
 
-
+    if ($dob > $today) {
+        $errors[] = 'Date of birth cannot be in the future.';
+    } elseif ($age < 18 || $age > 100) {
+        $errors[] = 'Applicants must be between 18 and 100 years old.';
+    } else {
+        $dobForDatabase = $dob->format('Y-m-d');
+    }
+}
 
 
 

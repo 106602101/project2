@@ -17,7 +17,7 @@ function is_valid_job_ref($ref_number) {
     if (!is_string($ref_number)) {
         return false;
     }
-    return preg_match('/^[A-Z0-9]{6}$/D', $ref_number);
+    return preg_match('/^[A-Z0-9]{6}$/D', $ref_number) === 1;
 }
 
 function is_valid_name($name, $max_length = 20) {

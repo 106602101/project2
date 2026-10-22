@@ -123,6 +123,12 @@ if (!is_valid_phone($raw['phone'])) {
     $errors[] = 'Phone number must contain 8-12 digits or spaces.';
 }
 
+$allowedSkills = [
+    'cybersecurity-fundamentals', 'network-security', 'incident-response',
+    'siem', 'web-security', 'penetration-testing', 'cloud-security',
+    'linux', 'scripting', 'risk-management', 'security-awareness',
+    'technical-documentation'
+];
 
 // Job reference: exactly 6 alphanumeric characters.
 if (!preg_match('/^[A-Z0-9]{6}$/D', $data['jobref'])) {

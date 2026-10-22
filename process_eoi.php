@@ -115,6 +115,9 @@ if ($stateOk && $postcodeOk && !postcode_matches_state($raw['postcode'], $raw['s
     $errors[] = 'Postcode does not match the selected state.';
 }
 
+if (!is_valid_email($raw['email'])) {
+    $errors[] = 'Please enter a valid email address.';
+}
 
 
 

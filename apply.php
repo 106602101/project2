@@ -1,343 +1,89 @@
-
 <?php
-$pageTitle = 'Apply | FABWEB Cybersecurity Services';
 
-$pageDescription = 'Apply for a cybersecurity role at FABWEB.';
-
-$pageStyles = '
-.form-shell h2 {
-    border-left: 5px solid #1677FF;
-    padding-left: 0.75rem;
+declare(strict_types=1);
+require_once __DIR__ . '/includes/db.inc';
+$jobs = db()->query('SELECT job_ref,title FROM jobs WHERE is_open = 1 ORDER BY job_ref')->fetch_all(MYSQLI_ASSOC);
+$old = $_SESSION['eoi_old'] ?? [];
+$errors = $_SESSION['eoi_errors'] ?? [];
+unset($_SESSION['eoi_old'], $_SESSION['eoi_errors']);
+$selectedRef = clean($old['job_ref'] ?? ($_GET['job_ref'] ?? ''), 6);
+function oldv(array $old, string $name): string
+{
+    return h((string) ($old[$name] ?? ''));
 }
-';
-
+$skills = [
+    'cybersecurity-fundamentals' => 'Cybersecurity Fundamentals',
+    'network-security' => 'Network Security',
+    'incident-response' => 'Incident Response',
+    'siem' => 'SIEM / Security Monitoring',
+    'web-security' => 'Web Security',
+    'penetration-testing' => 'Penetration Testing',
+    'cloud-security' => 'Cloud Security',
+    'linux' => 'Linux',
+    'scripting' => 'Python / Scripting',
+    'risk-management' => 'Risk Management',
+    'security-awareness' => 'Security Awareness',
+    'technical-documentation' => 'Technical Documentation',
+];
+$chosenSkills = is_array($old['skills'] ?? null) ? $old['skills'] : [];
+$pageTitle = 'Apply for a Position | FABWEB';
+$activePage = 'apply.php';
 require __DIR__ . '/includes/header.inc';
 ?>
-
 <main id="main-content">
-
     <section class="page-banner">
         <div class="container">
-            <p class="eyebrow">Career Application</p>
-            <h1>Apply to Join FABWEB</h1>
-            <p>
-                Complete the form using the six-character
-                reference from the position description.
-            </p>
+            <p class="eyebrow">Careers</p>
+            <h1>Expression of Interest</h1>
+            <p>All fields marked * are required. We verify every field on the server, even when browser validation is turned off.</p>
         </div>
     </section>
-
     <section class="section">
         <div class="container form-shell">
-
-            <div class="form-intro">
-                <h2>Application Form</h2>
-                <p>
-                    <span class="required-note">Required:</span>
-                    All fields except Other Skills must be completed.
-                </p>
-            </div>
-
-            <form class="application-form"
-                  method="post"
-                  action="process_eoi.php">
-
-                <div class="form-grid">
-
-                    <div class="form-group full">
-                        <label for="jobref">
-                            Job Reference Number *
-                        </label>
-                        <input type="text"
-                               name="jobref"
-                               id="jobref"
-                               maxlength="6"
-                               pattern="[A-Za-z0-9]{6}"
-                               placeholder="e.g. FW1001"
-                               required>
-                        <p class="help-text">
-                            Valid references: FW1001,
-                            FW1002, FW1003, FW1004.
-                        </p>
+            <?php if ($errors): ?><div class="notice error" role="alert"><strong>Please correct the following:</strong>
+                    <ul><?php foreach ($errors as $message): ?><li><?= h($message) ?></li><?php endforeach; ?></ul>
+                </div><?php endif; ?>
+            <form method="post" action="process_eoi.php" novalidate>
+                <input type="hidden" name="csrf_token" value="<?= h(csrf_token()) ?>">
+                <fieldset>
+                    <legend>Position</legend>
+                    <div class="field"><label for="job_ref">Job reference *</label><select id="job_ref" name="job_ref">
+                            <option value="">Choose a job</option><?php foreach ($jobs as $job): ?><option value="<?= h($job['job_ref']) ?>" <?= $selectedRef === $job['job_ref'] ? 'selected' : '' ?>><?= h($job['job_ref']) ?> — <?= h($job['title']) ?></option><?php endforeach; ?>
+                        </select></div>
+                </fieldset>
+                <fieldset>
+                    <legend>Personal details</legend>
+                    <div class="form-grid">
+                        <div class="field"><label for="first_name">First name *</label><input id="first_name" name="first_name" type="text" maxlength="20" value="<?= oldv($old, 'first_name') ?>"></div>
+                        <div class="field"><label for="last_name">Last name *</label><input id="last_name" name="last_name" type="text" maxlength="20" value="<?= oldv($old, 'last_name') ?>"></div>
+                        <div class="field"><label for="date_of_birth">Date of birth *</label><input id="date_of_birth" name="date_of_birth" type="date" value="<?= oldv($old, 'date_of_birth') ?>"></div>
+                        <div class="field"><label for="gender">Gender *</label><select id="gender" name="gender">
+                                <option value="">Select</option><?php foreach (['Male', 'Female', 'Other', 'Prefer not to say'] as $g): ?><option value="<?= h($g) ?>" <?= ($old['gender'] ?? '') === $g ? 'selected' : '' ?>><?= h($g) ?></option><?php endforeach; ?>
+                            </select></div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="firstname">
-                            First Name *
-                        </label>
-                        <input type="text"
-                               name="firstname"
-                               id="firstname"
-                               maxlength="20"
-                               pattern="[A-Za-z]{1,20}"
-                               autocomplete="given-name"
-                               required>
+                </fieldset>
+                <fieldset>
+                    <legend>Contact and address</legend>
+                    <div class="form-grid">
+                        <div class="field span2"><label for="street_address">Street address *</label><input id="street_address" name="street_address" type="text" maxlength="40" value="<?= oldv($old, 'street_address') ?>"></div>
+                        <div class="field"><label for="suburb_town">Suburb / town *</label><input id="suburb_town" name="suburb_town" type="text" maxlength="40" value="<?= oldv($old, 'suburb_town') ?>"></div>
+                        <div class="field"><label for="state">State / territory *</label><select id="state" name="state">
+                                <option value="">Select</option><?php foreach (['VIC', 'NSW', 'QLD', 'NT', 'WA', 'SA', 'TAS', 'ACT'] as $s): ?><option value="<?= h($s) ?>" <?= ($old['state'] ?? '') === $s ? 'selected' : '' ?>><?= h($s) ?></option><?php endforeach; ?>
+                            </select></div>
+                        <div class="field"><label for="postcode">Postcode (4 digits) *</label><input id="postcode" name="postcode" type="text" inputmode="numeric" maxlength="4" value="<?= oldv($old, 'postcode') ?>"></div>
+                        <div class="field"><label for="email">Email address *</label><input id="email" name="email" type="email" maxlength="254" value="<?= oldv($old, 'email') ?>"></div>
+                        <div class="field"><label for="phone">Phone (8–12 digits) *</label><input id="phone" name="phone" type="tel" maxlength="20" value="<?= oldv($old, 'phone') ?>"></div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="lastname">
-                            Last Name *
-                        </label>
-                        <input type="text"
-                               name="lastname"
-                               id="lastname"
-                               maxlength="20"
-                               pattern="[A-Za-z]{1,20}"
-                               autocomplete="family-name"
-                               required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="dob">
-                            Date of Birth *
-                        </label>
-                        <input type="text"
-                               name="dob"
-                               id="dob"
-                               placeholder="dd/mm/yyyy"
-                               pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}"
-                               required>
-                        <p class="help-text">
-                            Format: dd/mm/yyyy
-                        </p>
-                    </div>
-
-                    <fieldset class="form-group">
-                        <legend>Gender *</legend>
-
-                        <div class="radio-group">
-                            <label class="choice">
-                                <input type="radio"
-                                       name="gender"
-                                       value="female"
-                                       required>
-                                Female
-                            </label>
-
-                            <label class="choice">
-                                <input type="radio"
-                                       name="gender"
-                                       value="male">
-                                Male
-                            </label>
-
-                            <label class="choice">
-                                <input type="radio"
-                                       name="gender"
-                                       value="other">
-                                Another Identity
-                            </label>
-                        </div>
-                    </fieldset>
-
-                    <div class="form-group full">
-                        <label for="street">
-                            Street Address *
-                        </label>
-                        <input type="text"
-                               name="street"
-                               id="street"
-                               maxlength="40"
-                               autocomplete="street-address"
-                               required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="suburb">
-                            Suburb / Town *
-                        </label>
-                        <input type="text"
-                               name="suburb"
-                               id="suburb"
-                               maxlength="40"
-                               required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="state">
-                            State / Territory *
-                        </label>
-                        <select name="state"
-                                id="state"
-                                required>
-                            <option value="">
-                                Select State
-                            </option>
-                            <option value="VIC">VIC</option>
-                            <option value="NSW">NSW</option>
-                            <option value="QLD">QLD</option>
-                            <option value="NT">NT</option>
-                            <option value="WA">WA</option>
-                            <option value="SA">SA</option>
-                            <option value="TAS">TAS</option>
-                            <option value="ACT">ACT</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="postcode">
-                            Postcode *
-                        </label>
-                        <input type="text"
-                               name="postcode"
-                               id="postcode"
-                               maxlength="4"
-                               pattern="[0-9]{4}"
-                               inputmode="numeric"
-                               required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">
-                            Email Address *
-                        </label>
-                        <input type="email"
-                               name="email"
-                               id="email"
-                               autocomplete="email"
-                               required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="phone">
-                            Phone Number *
-                        </label>
-                        <input type="tel"
-                               name="phone"
-                               id="phone"
-                               pattern="[0-9]{8,12}"
-                               maxlength="12"
-                               inputmode="numeric"
-                               required>
-                        <p class="help-text">
-                            Enter 8-12 digits, without spaces.
-                        </p>
-                    </div>
-
-                    <fieldset class="form-group full">
-                        <legend>Skill List *</legend>
-
-                        <p class="help-text">
-                            Select your skills.
-                            Cybersecurity Fundamentals is required.
-                        </p>
-
-                        <div class="checkbox-grid">
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="cybersecurity-fundamentals"
-                                       required>
-                                Cybersecurity Fundamentals
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="network-security">
-                                Network Security
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="incident-response">
-                                Incident Response
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="siem">
-                                SIEM / Security Monitoring
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="web-security">
-                                Web Security
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="penetration-testing">
-                                Penetration Testing
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="cloud-security">
-                                Cloud Security
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="linux">
-                                Linux
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="scripting">
-                                Python / Scripting
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="risk-management">
-                                Risk Management
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="security-awareness">
-                                Security Awareness
-                            </label>
-
-                            <label class="choice">
-                                <input type="checkbox"
-                                       name="skills[]"
-                                       value="technical-documentation">
-                                Technical Documentation
-                            </label>
-
-                        </div>
-                    </fieldset>
-
-                    <div class="form-group full">
-                        <label for="other-skills">
-                            Other Skills (Optional)
-                        </label>
-
-                        <textarea
-                            name="other_skills"
-                            id="other-skills"
-                            maxlength="5000"
-                            placeholder="Other relevant skills, certifications or experience."></textarea>
-                    </div>
-
-                </div>
-
-                <div class="submit-row">
-                    <input type="submit"
-                           value="Submit Application">
-
-                    <input type="reset"
-                           value="Clear Form">
-                </div>
-
+                </fieldset>
+                <fieldset>
+                    <legend>Skills and experience</legend>
+                    <p>Cybersecurity Fundamentals is required. Select any additional skills that apply. *</p>
+                    <div class="checkbox-grid"><?php foreach ($skills as $value => $label): ?><label class="check"><input type="checkbox" name="skills[]" value="<?= h($value) ?>" <?= in_array($value, $chosenSkills, true) ? 'checked' : '' ?>><?= h($label) ?></label><?php endforeach; ?></div>
+                    <div class="field"><label for="other_skills">Other skills (optional)</label><textarea id="other_skills" name="other_skills" maxlength="1500" rows="5"><?= oldv($old, 'other_skills') ?></textarea></div>
+                </fieldset>
+                <button class="button" type="submit">Submit expression of interest</button> <a class="text-link" href="jobs.php">Back to jobs</a>
             </form>
         </div>
     </section>
-
 </main>
-
 <?php require __DIR__ . '/includes/footer.inc'; ?>

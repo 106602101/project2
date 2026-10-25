@@ -1,125 +1,45 @@
 <?php
-$pageTitle = 'About Our Team | FABWEB';
+
+declare(strict_types=1);
+require_once __DIR__ . '/includes/db.inc';
+$sections = db()->query('SELECT heading, body FROM about_sections ORDER BY display_order, id')->fetch_all(MYSQLI_ASSOC);
+$members = db()->query('SELECT member_name, student_id, part1_contribution, part2_contribution FROM team_members ORDER BY display_order, id')->fetch_all(MYSQLI_ASSOC);
+$pageTitle = 'About FABWEB and Our Team';
+$activePage = 'about.php';
 require __DIR__ . '/includes/header.inc';
 ?>
-
 <main id="main-content">
     <section class="page-banner">
         <div class="container">
-            <p class="eyebrow">COS10026 project team</p>
-            <h1>About our team</h1>
-            <p>This page documents the student team responsible for designing and developing the FABWEB recruitment website.</p>
+            <p class="eyebrow">Our story</p>
+            <h1>About FABWEB and our team</h1>
+            <p>Company details and team contributions are retrieved from our database.</p>
         </div>
     </section>
-
-    <!-- Group details section -->
     <section class="section">
-        <div class="container about-grid">
-            <section class="card team-summary" aria-labelledby="group-details-title">
-                <h2 id="group-details-title">Group details</h2>
-                <ul>
-                    <li>Group name: FABWEB Project Team
-                        <ul>
-                            <li>Tutorial day: <strong>Thursday</strong></li>
-                            <li>Tutorial time: <strong>04:30 PM</strong></li>
-                            <li>Allocated industry: G01 – Cybersecurity Services Company</li>
-                        </ul>
-                    </li>
-                </ul>
-            </section>
-
-            <figure class="team-figure">
-                <img src="assets/teamphoto.jpg" alt="Image of the FABWEB team members">
-                <figcaption>Team FABWEB</figcaption>
-            </figure>
-        </div>
-    </section>
-
-    <!-- Contributions section -->
-    <section class="section alt" aria-labelledby="contributions-title">
         <div class="container">
-            <h2 id="contributions-title">Member contributions</h2>
-            <dl class="definition-list">
-
-                <dt>Ravindu Shasimal Karunasinghe</dt>
-                <dd>Student ID <span class="student-id">1005541025</span> — <strong>Created GitHub repository, home page and apply page.</strong></dd>
-
-                <dt>Heshan Gimhana Naotunna Palliya Guruge</dt>
-                <dd>Student ID <span class="student-id">106378923</span> — <strong>Created WhatsApp group and the jobs page.</strong></dd>
-
-                <dt>Ethan Purvis</dt>
-                <dd>Student ID <span class="student-id">106602101</span> — <strong>Proof-read repository and created the about page.</strong></dd>
-
-            </dl>
-        </div>
-    </section>
-
-    <!-- Quotes section -->
-    <section class="section" aria-labelledby="quotes-title">
-        <div class="container">
-            <h2 id="quotes-title">Team quotes</h2>
-
-            <blockquote>
-                <p>“සිහින දකින්න, ඒවා සැබෑ කරගන්න.”</p>
-                <p><strong>English:</strong>“Dream, and make those dreams come true.”</p>
-                <footer>— Rav</footer>
-            </blockquote>
-            <blockquote>
-                <p>“උත්සාහය අත් නොහරින්න.”</p>
-                <p><strong>English:</strong> “Never give up.”</p>
-                <footer>— Heshan</footer>
-            </blockquote>
-            <blockquote>
-                <p>"In vino veritas"</p>
-                <p><strong>English:</strong> "In wine, there is truth."</p>
-                <footer>— Ethan</footer>
-            </blockquote>
-        </div>
-    </section>
-
-    <!-- Facts section -->
-    <section class="section alt" aria-labelledby="facts-title">
-        <div class="container">
-            <h2 id="facts-title">Student facts</h2>
-            <div class="table-wrap">
-                <table>
-                    <caption>FABWEB project team facts</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Member</th>
-                            <th scope="col">Student ID</th>
-                            <th scope="col">Study interest</th>
-                            <th scope="col">Project strength</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-
-                        <tr>
-                            <th scope="row">Ravindu Shasimal Karunasinghe</th>
-                            <td><span class="student-id">1005541025</span></td>
-                            <td>Data Science</td>
-                            <td>Teamwork and communication</td>
-                        </tr>
-
-                        <tr>
-                            <th scope="row">Heshan Gimhana Naotunna Palliya Guruge</th>
-                            <td><span class="student-id">1005541025</span></td>
-                            <td>Data Science</td>
-                            <td>Willingness to learn new technolgies</td>
-                        </tr>
-
-                        <tr>
-                            <th scope="row">Ethan Purvis</th>
-                            <td><span class="student-id">106602101</span></td>
-                            <td>Cyber Security</td>
-                            <td>Ability to keep code tidy and readable.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="cards">
+                <?php foreach ($sections as $section): ?><article class="card">
+                        <h2><?= h($section['heading']) ?></h2>
+                        <p><?= nl2br(h($section['body'])) ?></p>
+                    </article><?php endforeach; ?>
             </div>
         </div>
     </section>
+    <section class="section alt">
+        <div class="container">
+            <p class="eyebrow dark">Project contributions</p>
+            <h2>Our project team</h2>
+            <p class="section-intro">Contributions cover both Applied Web Project Part 1 and Part 2.</p>
+            <div class="cards"><?php foreach ($members as $member): ?><article class="card member">
+                        <h3><?= h($member['member_name']) ?></h3>
+                        <p class="muted">Student ID: <?= h($member['student_id']) ?></p>
+                        <h4>Project 1 contribution</h4>
+                        <p><?= nl2br(h($member['part1_contribution'])) ?></p>
+                        <h4>Project 2 contribution</h4>
+                        <p><?= nl2br(h($member['part2_contribution'])) ?></p>
+                    </article><?php endforeach; ?></div>
+        </div>
+    </section>
 </main>
-
-
 <?php require __DIR__ . '/includes/footer.inc'; ?>

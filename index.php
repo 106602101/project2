@@ -1,153 +1,78 @@
-
 <?php
+
+declare(strict_types=1);
+require_once __DIR__ . '/includes/db.inc';
+$openCount = (int) db()->query('SELECT COUNT(*) AS total FROM jobs WHERE is_open = 1')->fetch_assoc()['total'];
 $pageTitle = 'FABWEB Cybersecurity Services | Home';
+$activePage = 'index.php';
 require __DIR__ . '/includes/header.inc';
 ?>
-
 <main id="main-content">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="container hero-grid">
-        <div class="hero-content">
-          <p class="eyebrow" style="letter-spacing: 0.1em;">Melbourne Cybersecurity Careers</p>
-          <h1 id="hero-title">Secure the Web.<br>Protect What Matters.</h1>
-          <p>FABWEB Cybersecurity Services helps organisations protect websites, cloud platforms, networks and digital
-            services through practical, responsible and accessible security solutions.</p>
-
-          <div class="hero-actions">
-            <a class="button" href="jobs.html">Explore Open Roles</a>
-            <a class="button secondary" href="apply.html">Apply Now</a>
-          </div>
-
-          <div class="stats" aria-label="FABWEB recruitment highlights">
-            <div class="stat"><strong>4</strong> Open Positions</div>
-            <div class="stat"><strong>7</strong> Security Services</div>
-            <div class="stat"><strong>Hybrid</strong> Melbourne Roles</div>
-            <div class="stat"><strong>Security</strong> First Culture</div>
-          </div>
-        </div>
-
-        <div class="hero-visual">
-          <img src="assets/hero-cybersecurity.svg"
-            alt="Cybersecurity monitor showing a shield and connected security nodes">
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <p class="eyebrow">Melbourne cybersecurity careers</p>
+        <h1>Secure the Web.<br><span>Protect What Matters.</span></h1>
+        <p class="lead">Practical cybersecurity services that protect websites, networks, cloud platforms and digital operations.</p>
+        <div class="actions"><a class="button" href="jobs.php">Explore open roles</a><a class="button button-outline" href="apply.php">Apply now</a></div>
+        <div class="stats">
+          <div><strong><?= $openCount ?></strong><span>Open positions</span></div>
+          <div><strong>7</strong><span>Security services</span></div>
+          <div><strong>Melbourne</strong><span>Hybrid opportunities</span></div>
         </div>
       </div>
-    </section>
-
-    <section class="section" aria-labelledby="about-fabweb-title">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow" style="color: #0B5E6B;">About FABWEB</p>
-          <h2 id="about-fabweb-title">Cybersecurity built around people, systems and trust</h2>
-          <p>FABWEB Cybersecurity Services is a Melbourne-based cybersecurity company helping organisations protect
-            websites, cloud platforms, networks and digital services.</p>
-        </div>
-
-        <div class="cards">
-          <article class="card home-highlight">
-            <h3>Our Mission</h3>
-            <p>To make digital systems safer, more resilient and easier to trust through practical, responsible and
-              accessible cybersecurity services.</p>
+      <img class="hero-image" src="images/hero-cybersecurity.svg" alt="Illustration of a secured digital network and laptop">
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow dark">About FABWEB</p>
+      <h2>Cybersecurity built around people and trust</h2>
+      <p class="section-intro">FABWEB Cybersecurity Services helps organisations build secure and resilient digital systems, with a focus on practical risk reduction.</p>
+      <div class="cards">
+        <article class="card">
+          <h3>Mission</h3>
+          <p>Make digital systems safer and easier to trust using responsible and accessible cybersecurity services.</p>
+        </article>
+        <article class="card">
+          <h3>Vision</h3>
+          <p>Organisations and communities confidently using technology without compromising privacy or security.</p>
+        </article>
+        <article class="card">
+          <h3>Values</h3>
+          <p>Integrity, collaboration, privacy, continuous learning and responsible security testing.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section class="section alt">
+    <div class="container">
+      <p class="eyebrow dark">What we do</p>
+      <h2>Core cybersecurity services</h2>
+      <div class="cards service-grid">
+        <?php foreach ([['Security operations', 'Monitoring and incident response'], ['Penetration testing', 'Authorised testing of networks and applications'], ['Cloud security', 'Secure cloud identities and configurations'], ['Risk and compliance', 'Security governance and practical risk reviews'], ['Web security', 'Security assessments for online services'], ['Awareness training', 'Help staff identify social engineering'], ['Incident response', 'Contain, investigate and recover from attacks']] as $service): ?>
+          <article class="card">
+            <h3><?= h($service[0]) ?></h3>
+            <p><?= h($service[1]) ?></p>
           </article>
-
-          <article class="card home-highlight">
-            <h3>Our Vision</h3>
-            <p>A digital environment where organisations and communities can use technology confidently without
-              compromising security, privacy or accessibility.</p>
-          </article>
-
-          <article class="card home-highlight">
-            <h3>Our Values</h3>
-            <p>Security first, integrity, continuous learning, collaboration, privacy, accessibility and responsible
-              testing guide the way FABWEB operates.</p>
-          </article>
-        </div>
+        <?php endforeach; ?>
       </div>
-    </section>
-
-    <section class="section alt" aria-labelledby="services-title">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow" style="color: #0B5E6B;">What We Do</p>
-          <h2 id="services-title">Core Cybersecurity Services</h2>
-          <p>FABWEB provides protection, testing, cloud security and organisational security services.</p>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <caption>FABWEB cybersecurity service areas</caption>
-            <thead>
-              <tr>
-                <th scope="col">Service Area</th>
-                <th scope="col">Service</th>
-                <th scope="col">Purpose</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th scope="rowgroup" rowspan="2">Protection &amp; Response</th>
-                <td>Security Operations &amp; Monitoring</td>
-                <td>Monitor systems and identify suspicious activity.</td>
-              </tr>
-              <tr>
-                <td>Incident Response</td>
-                <td>Investigate, contain and recover from security incidents.</td>
-              </tr>
-              <tr>
-                <th scope="rowgroup" rowspan="2">Security Testing</th>
-                <td>Penetration Testing</td>
-                <td>Identify weaknesses through authorised security testing.</td>
-              </tr>
-              <tr>
-                <td>Web Application Security</td>
-                <td>Review websites and client portals for vulnerabilities.</td>
-              </tr>
-              <tr>
-                <th scope="row">Cloud Security</th>
-                <td>Cloud Security Assessment</td>
-                <td>Review cloud environments, identity controls and configurations.</td>
-              </tr>
-              <tr>
-                <th scope="rowgroup" rowspan="2">People &amp; Governance</th>
-                <td>Cybersecurity Awareness</td>
-                <td>Help employees recognise phishing and social-engineering threats.</td>
-              </tr>
-              <tr>
-                <td>Security Risk &amp; Compliance</td>
-                <td>Support policies, risk management and security requirements.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section class="section" aria-labelledby="careers-title">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow" style="color: #0B5E6B;">Careers</p>
-          <h2 id="careers-title">Build a safer digital future with FABWEB</h2>
-          <p>Our open roles cover security operations, penetration testing, cloud security and cybersecurity risk
-            management.</p>
-        </div>
-        <a class="button" href="jobs.html">View Cybersecurity Jobs</a>
-      </div>
-    </section>
-
-    <section class="section alt" aria-labelledby="ack-title">
-      <div class="container">
-        <div class="acknowledgement">
-          <h2 id="ack-title">Acknowledgement of Country</h2>
-          <p>FABWEB acknowledges the Wurundjeri Woi-wurrung people of the Kulin Nation as the Traditional Owners of the
-            land on which our Melbourne office is located.</p>
-          <p>We pay respect to their Elders past and present and recognise their continuing connection to land, waters,
-            culture and community.</p>
-          <p>FABWEB supports an inclusive workplace and welcomes applications from Aboriginal and Torres Strait Islander
-            peoples.</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-
+    </div>
+  </section>
+  <section class="section">
+    <div class="container careers-cta">
+      <div>
+        <p class="eyebrow dark">Careers</p>
+        <h2>Build a safer digital future</h2>
+        <p>Explore roles in security operations, penetration testing, cloud security and cybersecurity risk.</p>
+      </div><a class="button" href="jobs.php">View careers</a>
+    </div>
+  </section>
+  <section class="section alt">
+    <div class="container">
+      <h2>Acknowledgement of Country</h2>
+      <p>FABWEB acknowledges the Wurundjeri Woi-wurrung people of the Kulin Nation as Traditional Owners of the land on which our Melbourne office is located and pays respect to Elders past and present.</p>
+    </div>
+  </section>
+</main>
 <?php require __DIR__ . '/includes/footer.inc'; ?>
-  

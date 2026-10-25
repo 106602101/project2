@@ -1,93 +1,98 @@
 <?php
-// Sanitises a single value OR an entire array 
+declare(strict_types=1);
 
-function sanitise($input) {
-
-    $output = is_array($input) 
-    // Allows for nested arrays by including the function inside itself
-        ? array_map("sanitise", $input) 
-        : clean_value($input);
-
-    return $output;
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+    ini_set('session.cookie_httponly', '1');
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        ini_set('session.cookie_secure', '1');
+    }
+    session_start();
 }
 
-// Validators 
-
-function is_valid_job_ref($ref_number) {
-    if (!is_string($ref_number)) {
-        return false;
-    }
-    return preg_match('/^[A-Z0-9]{6}$/D', $ref_number) === 1;
+function h(?string $value): string
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function is_valid_name($name, $max_length = 20) {
-    if (!is_string($name)) {
-        return false;
-    }
-    $name = trim($name);
-    return preg_match("/^[A-Za-z' -]+$/", $name) === 1
-        && strlen($name) <= $max_length;
-}
-
-function is_valid_date($date) {
-    if (!is_string($date)){
-        return false;
-    }
-    $date = trim($date);
-    if (preg_match("/^(\d{2})\/(\d{2})\/(\d{4})$/", $date, $parts) !== 1) {
-        return false;
-    }
-    return checkdate((int) $parts[2], (int) $parts[1], (int) $parts[3]);
-}
-
-function is_in_list($value, $allowed) {
+/** Clean form input for storage; escape HTML only when rendering with h(). */
+function clean($value, int $maxLength = 1000): string
+{
     if (!is_string($value)) {
-        return false;
+        return '';
     }
-    return in_array(trim($value), $allowed, true);
+    $value = trim(stripslashes($value));
+    $value = strip_tags($value);
+    $value = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $value) ?? '';
+    return function_exists('mb_substr')
+        ? mb_substr($value, 0, $maxLength, 'UTF-8')
+        : substr($value, 0, $maxLength);
 }
 
-function is_valid_postcode($postcode) {
-    if (!is_string($postcode)) {
-        return false;
-    }
-    return preg_match("/^\d{4}$/", trim($postcode)) === 1;
+function text_length(string $value): int
+{
+    return function_exists('mb_strlen') ? mb_strlen($value, 'UTF-8') : strlen($value);
 }
 
-function postcode_matches_state($postcode, $state) {
-    $first_digits = [
-        'VIC' => ['3', '8'], 'NSW' => ['1', '2'], 'QLD' => ['4', '9'],
-        'NT'  => ['0'],      'ACT' => ['0'],      'WA'  => ['6'],
-        'SA'  => ['5'],      'TAS' => ['7']
-    ];
-    if (!is_string($postcode) || !isset($first_digits[$state])) {
-        return false;
+function csrf_token(): string
+{
+    if (!isset($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
-    return in_array(substr(trim($postcode), 0, 1), $first_digits[$state], true);
+    return $_SESSION['csrf_token'];
 }
 
-function is_valid_email($email) {
-    if (!is_string($email)) {
-        return false;
-    }
-    $email = trim($email);
-    return strlen($email) <= 254
-        && filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+function verify_csrf(): bool
+{
+    return isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])
+        && hash_equals(csrf_token(), $_POST['csrf_token']);
 }
 
-function is_valid_phone($phone) {
-    if (!is_string($phone)) {
-        return false;
-    }
-    return preg_match("/^[0-9 ]{8,12}$/", trim($phone)) === 1;
+function redirect(string $path): void
+{
+    header('Location: ' . $path, true, 303);
+    exit;
 }
 
-// INTERNAL HELPERS: Used only by functions above.
-// Other pages should only use the public functions above.
+function flash(string $type, string $message): void
+{
+    $_SESSION['flash'] = ['type' => $type, 'message' => $message];
+}
 
-function clean_value($value) {
-    $value = (string) $value;
-    $value = trim($value);
-    $value = stripslashes($value);
-    return htmlspecialchars($value, ENT_QUOTES, "UTF-8");
+function take_flash(): ?array
+{
+    $result = $_SESSION['flash'] ?? null;
+    unset($_SESSION['flash']);
+    return $result;
+}
+
+function current_user(): ?string
+{
+    return isset($_SESSION['admin_username']) ? (string) $_SESSION['admin_username'] : null;
+}
+
+function require_login(): void
+{
+    if (current_user() === null) {
+        redirect('login.php');
+    }
+}
+
+function valid_job_ref(string $value): bool
+{
+    return (bool) preg_match('/^[A-Za-z0-9]{5,6}$/D', $value);
+}
+
+function display_pipe_list(?string $items, string $listType = 'ul'): void
+{
+    $tag = $listType === 'ol' ? 'ol' : 'ul';
+    echo '<' . $tag . '>';
+    foreach (explode('|', (string) $items) as $item) {
+        $item = trim($item);
+        if ($item !== '') {
+            echo '<li>' . h($item) . '</li>';
+        }
+    }
+    echo '</' . $tag . '>';
 }

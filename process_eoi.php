@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST' ||
 
 $pageTitle = 'Application Result | FABWEB';
 
-// Clean incoming text. Escape it when displaying in HTML.
+
 function cleanInput($value): string {
     if (!is_string($value)) {
         return '';
@@ -226,7 +226,7 @@ if (empty($errors)) {
 
         $conn->set_charset('utf8mb4');
 
-        // Automatically create the EOI table if missing.
+        // Automatically create the EOI table if missing.`--
         $createTable = "
             CREATE TABLE IF NOT EXISTS eoi (
                 EOInumber INT UNSIGNED AUTO_INCREMENT

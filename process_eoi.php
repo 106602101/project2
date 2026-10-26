@@ -233,4 +233,47 @@ if ($conn instanceof mysqli) {
     $conn->close();
 }
 
+// --------- Output ---------
+require __DIR__ . '/includes/header.inc';
+?>
 
+<main id="main-content">
+    <section class="section">
+        <div class="container">
+
+            <?php if ($eoiNumber !== null): ?>
+
+                <h1>Application Submitted Successfully</h1>
+                <p>Thank you, <strong><?= $safe['firstname'] ?></strong>.
+                   Your application has been saved.</p>
+                <h2>Your EOI Number: <?= (int) $eoiNumber ?></h2>
+                <p>Job Reference: <?= $safe['jobref'] ?></p>
+                <p>Status: <strong>New</strong></p>
+                <p>Please keep your EOI number for future reference.</p>
+                <a class="button" href="index.php">Return to Home</a>
+
+            <?php elseif ($databaseError): ?>
+
+                <h1>Unable to Submit Application</h1>
+                <p>A database error occurred. Please try again later.</p>
+                <a href="apply.php">Back to Application</a>
+
+            <?php else: ?>
+
+                <h1>Application Validation Failed</h1>
+                <p>Please correct the following errors:</p>
+                <ul>
+                    <?php foreach ($errors as $error): ?>
+                        <li><?= $error ?></li>
+                    <?php endforeach; ?>
+                </ul>
+                <a href="apply.php">Back to Application</a>
+
+            <?php endif; ?>
+
+        </div>
+    </section>
+</main>
+
+
+<?php require __DIR__ . '/includes/footer.inc'; ?>

@@ -196,6 +196,31 @@ if (empty($errors) && !$databaseError) {
         ";
         $conn->query($createTable);
 
+        $sql = "
+            INSERT INTO eoi (
+                jobref, firstname, lastname, dob, gender, street, suburb,
+                state, postcode, email, phone, skills, other_skills
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param(
+            'sssssssssssss',
+            $safe['jobref'],
+            $safe['firstname'],
+            $safe['lastname'],
+            $dobForDatabase,
+            $safe['gender'],
+            $safe['street'],
+            $safe['suburb'],
+            $safe['state'],
+            $safe['postcode'],
+            $safe['email'],
+            $safe['phone'],
+            $skillsJson,
+            $safe['other_skills']
+        );
+        $stmt->execute();
+
 
     }
 }

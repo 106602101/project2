@@ -221,7 +221,11 @@ if (empty($errors) && !$databaseError) {
         );
         $stmt->execute();
 
-
+        $eoiNumber = $conn->insert_id;
+        $stmt->close();
+    } catch (mysqli_sql_exception $exception) {
+        error_log('FABWEB database error: ' . $exception->getMessage());
+        $databaseError = true;
     }
 }
 

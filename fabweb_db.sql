@@ -1,5 +1,5 @@
 -- FABWEB project database export (import in phpMyAdmin).
--- No MySQL password. Default HR login username admin / password admin.
+
 CREATE DATABASE IF NOT EXISTS `fabweb_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `fabweb_db`;
 
@@ -83,7 +83,7 @@ INSERT INTO `about_sections` (`section_key`,`heading`,`body`,`display_order`) VA
 INSERT INTO `about_sections` (`section_key`,`heading`,`body`,`display_order`) VALUES ('values','Our values','Security first, integrity, continuous learning, collaboration, privacy, accessibility and responsible testing.',4) ON DUPLICATE KEY UPDATE `section_key`=`section_key`;
 
 -- IMPORTANT: Replace the illustrative member records with the actual Part 1 group
--- member names/IDs and accurate Part 1/Part 2 contributions before submission.
-INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Ethan Purvis','106602101','Proof-read repository and created the about page.', 'Created new repository. Handled server-side validation and sanitisation. Built the shared functions.inc file, containing sanitisation and validation functions.',1);
-INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Jack Eadie','101825819','Created Jobs table/database','',2);
-INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Team member 3 — UPDATE NAME','UPDATE-ID','Update with this member’s actual Part 1 tasks and evidence.','Update with this member’s actual Part 2 tasks and evidence.',3);
+INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Shashimal Karunasinghe','105541025','Created the GitHub repository, developed the Home and Apply pages, reviewed the website for errors, and performed the final code cleanup.','Converted HTML pages into PHP and implemented reusable header, navigation, and footer components using PHP includes. Developed the Manage and Application pages, implemented the EOI database functionality, and performed final code reviews and cleanup.',1);
+INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Ethan Purvis','106602101','Reviewed and proofread the project repository, checked the website for consistency, and contributed to the development of the About page.', 'Created the project repository, implemented server-side validation and data sanitisation, and contributed to the Manage page. Developed the shared functions.inc file containing reusable validation and sanitisation functions.',2);
+INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Jack Eadie','101825819','-','Developed the Jobs page with database integration, created and configured the Jobs table, and implemented the HR Manager login form.',3);
+INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Heshan Gimhana','106378923','Developed the Jobs page, including the presentation of job descriptions, requirements, and employment opportunities.','Developed the About page to present company information and team member contributions for both Project 1 and Project 2.',4);

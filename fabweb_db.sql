@@ -84,5 +84,5 @@ INSERT INTO `about_sections` (`section_key`,`heading`,`body`,`display_order`) VA
 
 -- IMPORTANT: Replace the illustrative member records with the actual Part 1 group
 -- member names/IDs and accurate Part 1/Part 2 contributions before submission.
-INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Team member 1 — UPDATE NAME','UPDATE-ID','Update with this member’s actual Part 1 work (design, home page, job descriptions, forms, testing, etc.).','Update with this member’s actual Part 2 work (PHP includes, validation, SQL, management pages, tests, etc.).',1);
+INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Ethan Purvis','106602101','Proof-read repository and created the about page.', 'Created new repository. Handled server-side validation and sanitisation. Built the shared functions.inc file, containing sanitisation and validation functions.',1);
 INSERT INTO `team_members` (`member_name`,`student_id`,`part1_contribution`,`part2_contribution`,`display_order`) VALUES ('Team member 2 — UPDATE NAME','UPDATE-ID','Update with this member’s actual Part 1 tasks and evidence.','Update with this member’s actual Part 2 tasks and evidence.',2);

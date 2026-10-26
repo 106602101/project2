@@ -229,4 +229,8 @@ if (empty($errors) && !$databaseError) {
     }
 }
 
+if ($conn instanceof mysqli) {
+    $conn->close();
+}
+
 

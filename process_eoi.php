@@ -1,152 +1,278 @@
 <?php
 
-declare(strict_types=1);
-require_once __DIR__ . '/includes/db.inc';
-
-// A direct browser visit (GET) cannot create or view an application.
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('apply.php');
-}
-if (!verify_csrf()) {
-    http_response_code(403);
-    exit('Invalid form token. Return to the application page and try again.');
+// Blocks direct access, ensures POST request has core fields.
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' ||
+    !isset($_POST['jobref'], $_POST['firstname'],
+             $_POST['lastname'], $_POST['dob'])) {
+    header('Location: apply.php');
+    exit;
 }
 
-$fields = ['job_ref', 'first_name', 'last_name', 'date_of_birth', 'gender', 'street_address', 'suburb_town', 'state', 'postcode', 'email', 'phone', 'other_skills'];
-$data = [];
-foreach ($fields as $field) {
-    $data[$field] = clean($_POST[$field] ?? '', 4000);
+$pageTitle = 'Application Result | FABWEB';
+
+// protects against potentially malicious input
+function post_string($key) {
+    $value = $_POST[$key] ?? '';
+    return is_string($value) ? trim($value) : '';
 }
+
+function escapeHtml(string $value): string {
+    return htmlspecialchars(
+        $value,
+        ENT_QUOTES | ENT_SUBSTITUTE,
+        'UTF-8'
+    );
+}
+
+// ----------- Collect raw values -------------
+$raw = [
+    'jobref'      => strtoupper(post_string('jobref')),
+    'firstname'   => post_string('firstname'),
+    'lastname'    => post_string('lastname'),
+    'dob'         => post_string('dob'),
+    'gender'      => post_string('gender'),
+    'street'      => post_string('street'),
+    'suburb'      => post_string('suburb'),
+    'state'       => post_string('state'),
+    'postcode'    => post_string('postcode'),
+    'email'       => post_string('email'),
+    'phone'       => post_string('phone'),
+    'other_skills'=> post_string('other_skills')
+];
+
+$errors        = [];
+$eoiNumber     = null;
+$databaseError = false;
+$conn          = null;
+$validJobs     = [];
+
+// --------- Load valid job references from jobs table -----------
+require_once __DIR__ . '/settings.php';
+
+try {
+    mysqli_report(MYSQLI_REPORT_ERROR);
+    $conn = new mysqli($host, $user, $pwd, $sql_db);
+    $conn->set_charset('utf8mb4');
+
+    $result = $conn->query("SELECT jobref FROM jobs");
+    while ($row = $result->fetch_assoc()) {
+        $validJobs[] = $row['jobref'];
+    }
+    $result->free();
+    } catch (mysqli_sql_exception $exception) {
+    error_log('FABWEB database error: ' . $exception->getMessage());
+    $databaseError = true;
+}
+
+// ----------------------- Validation -----------------------------
+if (!is_valid_job_ref($raw['jobref'])) {
+    $errors[] = 'Job reference must have 6 letters or numbers.';
+} elseif (!is_in_list($raw['jobref'], $validJobs)) {
+    $errors[] = 'Please enter a valid FABWEB job reference.';
+}
+
+if (!is_valid_name($raw['firstname'], 20)) {
+    $errors[] = 'First name must contain 1-20 letters only.';
+}
+if (!is_valid_name($raw['lastname'], 20)) {
+    $errors[] = 'Last name must contain 1-20 letters only.';
+}
+
+$dobForDatabase = null;
+if (!is_valid_date($raw['dob'])) {
+    $errors[] = 'Date of birth must be a real date in dd/mm/yyyy format.';
+} else {
+    $dob   = DateTimeImmutable::createFromFormat('!d/m/Y', $raw['dob']);
+    $today = new DateTimeImmutable('today');
+    $age   = $dob->diff($today)->y;
+
+    if ($dob > $today) {
+        $errors[] = 'Date of birth cannot be in the future.';
+    } elseif ($age < 18 || $age > 100) {
+        $errors[] = 'Applicants must be between 18 and 100 years old.';
+    } else {
+        $dobForDatabase = $dob->format('Y-m-d');
+    }
+}
+
+if (!is_in_list($raw['gender'], ['female', 'male', 'other'])) {
+    $errors[] = 'Please select a valid gender option.';
+}
+
+foreach (['street' => 'Street address', 'suburb' => 'Suburb/town'] as $field => $label) {
+    $length = mb_strlen($raw[$field], 'UTF-8');
+    if ($length < 1 || $length > 40) {
+        $errors[] = "$label must contain 1-40 characters.";
+    }
+}
+
+
+$validStates = ['VIC', 'NSW', 'QLD', 'NT', 'WA', 'SA', 'TAS', 'ACT'];
+$stateOk = is_in_list($raw['state'], $validStates);
+if (!$stateOk) {
+    $errors[] = 'Please select a valid state or territory.';
+}
+
+$postcodeOk = is_valid_postcode($raw['postcode']);
+if (!$postcodeOk) {
+    $errors[] = 'Postcode must contain exactly 4 digits.';
+}
+
+if ($stateOk && $postcodeOk && !postcode_matches_state($raw['postcode'], $raw['state'])) {
+    $errors[] = 'Postcode does not match the selected state.';
+}
+
+if (!is_valid_email($raw['email'])) {
+    $errors[] = 'Please enter a valid email address.';
+}
+
+if (!is_valid_phone($raw['phone'])) {
+    $errors[] = 'Phone number must contain 8-12 digits or spaces.';
+}
+
 $allowedSkills = [
-    'cybersecurity-fundamentals',
-    'network-security',
-    'incident-response',
-    'siem',
-    'web-security',
-    'penetration-testing',
-    'cloud-security',
-    'linux',
-    'scripting',
-    'risk-management',
-    'security-awareness',
+    'cybersecurity-fundamentals', 'network-security', 'incident-response',
+    'siem', 'web-security', 'penetration-testing', 'cloud-security',
+    'linux', 'scripting', 'risk-management', 'security-awareness',
     'technical-documentation'
 ];
-$submittedSkills = is_array($_POST['skills'] ?? null) ? $_POST['skills'] : [];
-$selectedSkills = [];
-foreach ($submittedSkills as $skill) {
-    if (is_string($skill) && in_array($skill, $allowedSkills, true) && !in_array($skill, $selectedSkills, true)) {
-        $selectedSkills[] = $skill;
-    }
-}
-$errors = [];
-if (!valid_job_ref($data['job_ref'])) {
-    $errors[] = 'Choose a valid 5–6 character job reference.';
-} else {
-    $check = db()->prepare('SELECT job_ref FROM jobs WHERE job_ref = ? AND is_open = 1');
-    $check->bind_param('s', $data['job_ref']);
-    $check->execute();
-    if (!$check->get_result()->fetch_assoc()) {
-        $errors[] = 'The selected job reference is not open.';
-    }
-    $check->close();
-}
-foreach (['first_name' => 'First name', 'last_name' => 'Last name'] as $key => $label) {
-    if (!preg_match("/^[\\p{L}][\\p{L} '\x{2019}-]{0,19}$/uD", $data[$key]) || text_length($data[$key]) > 20) {
-        $errors[] = "$label must contain 1–20 letters and valid name punctuation.";
-    }
-}
-$dob = $data['date_of_birth'];
-$date = DateTimeImmutable::createFromFormat('!Y-m-d', $dob);
-if (!$date || $date->format('Y-m-d') !== $dob) {
-    $errors[] = 'Enter a valid date of birth.';
-} else {
-    $today = new DateTimeImmutable('today');
-    $age = $date->diff($today)->y;
-    if ($date > $today || $age < 16 || $age > 100) {
-        $errors[] = 'Applicant age must be between 16 and 100 years.';
-    }
-}
-if (!in_array($data['gender'], ['Male', 'Female', 'Other', 'Prefer not to say'], true)) {
-    $errors[] = 'Select a valid gender option.';
-}
-foreach (['street_address' => 40, 'suburb_town' => 40] as $key => $limit) {
-    if ($data[$key] === '' || text_length($data[$key]) > $limit) {
-        $errors[] = str_replace('_', ' ', ucfirst($key)) . " is required and must be at most $limit characters.";
-    }
-}
-if (!in_array($data['state'], ['VIC', 'NSW', 'QLD', 'NT', 'WA', 'SA', 'TAS', 'ACT'], true)) {
-    $errors[] = 'Select a valid Australian state or territory.';
-}
-if (!preg_match('/^[0-9]{4}$/D', $data['postcode'])) {
-    $errors[] = 'Postcode must contain exactly four digits.';
-}
-if (strlen($data['email']) > 254 || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-    $errors[] = 'Enter a valid email address.';
-}
-if (!preg_match('/^[0-9 ]+$/D', $data['phone']) || !preg_match('/^[0-9]{8,12}$/D', str_replace(' ', '', $data['phone']))) {
-    $errors[] = 'Phone number must contain 8–12 digits (spaces allowed).';
-}
-if (!$selectedSkills) {
-    $errors[] = 'Choose at least one skill.';
-}
-if (!in_array('cybersecurity-fundamentals', $selectedSkills, true)) {
-    $errors[] = 'Cybersecurity Fundamentals is required.';
-}
-if (text_length($data['other_skills']) > 1500) {
-    $errors[] = 'Other skills must be 1500 characters or fewer.';
-}
-if ($errors) {
-    $_SESSION['eoi_errors'] = $errors;
-    $_SESSION['eoi_old'] = $data + ['skills' => $selectedSkills];
-    redirect('apply.php');
+
+$submittedSkills = $_POST['skills'] ?? [];
+if (!is_array($submittedSkills)) {
+    $errors[] = 'Invalid skills format.';
+    $submittedSkills = [];
 }
 
-// The assessment explicitly requires creation in PHP when eoi is absent.
-// jobs must already exist (import fabweb_db.sql once to install the site).
-db()->query("CREATE TABLE IF NOT EXISTS eoi (
- EOInumber INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
- job_ref VARCHAR(6) NOT NULL,
- first_name VARCHAR(20) NOT NULL,
- last_name VARCHAR(20) NOT NULL,
- date_of_birth DATE NOT NULL,
- gender ENUM('Male','Female','Other','Prefer not to say') NOT NULL,
- street_address VARCHAR(40) NOT NULL,
- suburb_town VARCHAR(40) NOT NULL,
- state ENUM('VIC','NSW','QLD','NT','WA','SA','TAS','ACT') NOT NULL,
- postcode CHAR(4) NOT NULL,
- email VARCHAR(254) NOT NULL,
- phone VARCHAR(20) NOT NULL,
- skills VARCHAR(500) NOT NULL,
- other_skills TEXT NULL,
- status ENUM('New','Current','Final') NOT NULL DEFAULT 'New',
- created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
- INDEX idx_eoi_job (job_ref), INDEX idx_eoi_name (first_name,last_name),
- CONSTRAINT fk_eoi_job FOREIGN KEY (job_ref) REFERENCES jobs(job_ref)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
-$joinedSkills = implode(', ', $selectedSkills);
-$stmt = db()->prepare('INSERT INTO eoi (job_ref,first_name,last_name,date_of_birth,gender,street_address,suburb_town,state,postcode,email,phone,skills,other_skills) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)');
-$stmt->bind_param('sssssssssssss', $data['job_ref'], $data['first_name'], $data['last_name'], $data['date_of_birth'], $data['gender'], $data['street_address'], $data['suburb_town'], $data['state'], $data['postcode'], $data['email'], $data['phone'], $joinedSkills, $data['other_skills']);
-$stmt->execute();
-$eoiNumber = db()->insert_id;
-$stmt->close();
-// Prevent an old tab from reusing the just-submitted CSRF token.
-unset($_SESSION['csrf_token']);
-$pageTitle = 'Application Submitted | FABWEB';
-$activePage = 'apply.php';
+$skillsAllValid = true;
+foreach ($submittedSkills as $skill) {
+    if (!is_in_list($skill, $allowedSkills)) {
+        $skillsAllValid = false;
+        break;
+    }
+}
+
+if (empty($submittedSkills)) {
+    $errors[] = 'Please select at least one skill.';
+} elseif (!$skillsAllValid) {
+    $errors[] = 'An invalid skill was selected.';
+} elseif (!in_array('cybersecurity-fundamentals', $submittedSkills, true)) {
+    // Required checkbox carried over from Part 1.
+    $errors[] = 'Cybersecurity Fundamentals is required.';
+}
+
+if (mb_strlen($raw['other_skills'], 'UTF-8') > 5000) {
+    $errors[] = 'Other skills must be under 5000 characters.';
+}
+
+// --------- Sanitise ------------
+$safe = sanitise($raw);
+$skillsJson = json_encode(array_values(array_unique($submittedSkills)));
+
+// ----------- Store -------------
+if (empty($errors) && !$databaseError) {
+    try {
+        // Column sizes larger than validation limits because of HTML-escape 
+        $createTable = "
+            CREATE TABLE IF NOT EXISTS eoi (
+                EOInumber INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                jobref CHAR(6) NOT NULL,
+                firstname VARCHAR(120) NOT NULL,
+                lastname VARCHAR(120) NOT NULL,
+                dob DATE NOT NULL,
+                gender ENUM('female','male','other') NOT NULL,
+                street VARCHAR(240) NOT NULL,
+                suburb VARCHAR(240) NOT NULL,
+                state ENUM('VIC','NSW','QLD','NT','WA','SA','TAS','ACT') NOT NULL,
+                postcode CHAR(4) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                phone VARCHAR(12) NOT NULL,
+                skills TEXT NOT NULL,
+                other_skills TEXT,
+                status ENUM('New','Current','Final') NOT NULL DEFAULT 'New',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                INDEX idx_jobref (jobref),
+                INDEX idx_applicant (lastname, firstname)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ";
+        $conn->query($createTable);
+
+        $sql = "
+            INSERT INTO eoi (
+                jobref, firstname, lastname, dob, gender, street, suburb,
+                state, postcode, email, phone, skills, other_skills
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param(
+            'sssssssssssss',
+            $safe['jobref'],
+            $safe['firstname'],
+            $safe['lastname'],
+            $dobForDatabase,
+            $safe['gender'],
+            $safe['street'],
+            $safe['suburb'],
+            $safe['state'],
+            $safe['postcode'],
+            $safe['email'],
+            $safe['phone'],
+            $skillsJson,
+            $safe['other_skills']
+        );
+        $stmt->execute();
+
+        $eoiNumber = $conn->insert_id;
+        $stmt->close();
+    } catch (mysqli_sql_exception $exception) {
+        error_log('FABWEB database error: ' . $exception->getMessage());
+        $databaseError = true;
+    }
+}
+
+if ($conn instanceof mysqli) {
+    $conn->close();
+}
+
+// --------- Output ---------
 require __DIR__ . '/includes/header.inc';
 ?>
 <main id="main-content">
     <section class="section">
-        <div class="container narrow">
-            <div class="card success-card">
-                <p class="eyebrow dark">Application received</p>
-                <h1>Thank you, <?= h($data['first_name']) ?>.</h1>
-                <p>Your expression of interest for <strong><?= h($data['job_ref']) ?></strong> has been saved successfully.</p>
-                <p class="confirmation-number">EOI number: <strong><?= (int) $eoiNumber ?></strong></p>
-                <p>Your initial application status is <strong>New</strong>. Keep this reference number for your records.</p>
-                <a class="button" href="jobs.php">Back to open jobs</a>
-            </div>
+        <div class="container">
+
+            <?php if ($eoiNumber !== null): ?>
+
+                <h1>Application Submitted Successfully</h1>
+                <p>Thank you, <strong><?= $safe['firstname'] ?></strong>.
+                   Your application has been saved.</p>
+                <h2>Your EOI Number: <?= (int) $eoiNumber ?></h2>
+                <p>Job Reference: <?= $safe['jobref'] ?></p>
+                <p>Status: <strong>New</strong></p>
+                <p>Please keep your EOI number for future reference.</p>
+                <a class="button" href="index.php">Return to Home</a>
+
+            <?php elseif ($databaseError): ?>
+
+                <h1>Unable to Submit Application</h1>
+                <p>A database error occurred. Please try again later.</p>
+                <a href="apply.php">Back to Application</a>
+
+            <?php else: ?>
+
+                <h1>Application Validation Failed</h1>
+                <p>Please correct the following errors:</p>
+                <ul>
+                    <?php foreach ($errors as $error): ?>
+                        <li><?= $error ?></li>
+                    <?php endforeach; ?>
+                </ul>
+                <a href="apply.php">Back to Application</a>
+
+            <?php endif; ?>
+
         </div>
     </section>
 </main>
+
+
 <?php require __DIR__ . '/includes/footer.inc'; ?>

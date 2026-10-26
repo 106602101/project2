@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="550" viewBox="0 0 740 550" role="img" aria-label="Cybersecurity illustration">
+<defs><linearGradient id="g" x1="0" x2="1" y2="1"><stop stop-color="#124966"/><stop offset="1" stop-color="#081f39"/></linearGradient><linearGradient id="t" y1="0" y2="1"><stop stop-color="#73f0e3"/><stop offset="1" stop-color="#109ba9"/></linearGradient></defs>
+<circle cx="375" cy="266" r="220" fill="#123c53" opacity=".45"/><circle cx="375" cy="266" r="175" fill="none" stroke="#19546b" stroke-width="2" stroke-dasharray="6 10"/><circle cx="375" cy="266" r="134" fill="none" stroke="#257087" stroke-width="2"/>
+<g fill="none" stroke="#38a6b5" stroke-width="2" opacity=".7"><path d="M80 150 250 223M603 100 490 230M600 430 490 330M100 425 268 330"/><path d="M250 223 320 210M490 230 440 213M490 330 440 330M268 330 320 330"/></g>
+<g fill="#78ebe0"><circle cx="80" cy="150" r="9"/><circle cx="603" cy="100" r="9"/><circle cx="600" cy="430" r="9"/><circle cx="100" cy="425" r="9"/></g>
+<g><rect x="195" y="140" width="364" height="269" rx="18" fill="#071b2a" stroke="#70d5df" stroke-width="6"/><rect x="213" y="159" width="329" height="226" rx="7" fill="url(#g)"/><path d="M315 428h124l-13-19H328Z" fill="#b4d8e1"/><path d="M270 435h208v12H270Z" fill="#8dc7d4"/></g>
+<g><path d="m375 187 92 33v67c0 65-38 106-92 123-54-17-92-58-92-123v-67Z" fill="url(#t)"/><path d="m375 203 74 26v59c0 49-27 85-74 104-47-19-74-55-74-104v-59Z" fill="#113b57"/><path d="m338 288 23 23 50-54" fill="none" stroke="#8ef8e9" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/></g>
+<g fill="#82f0e4" font-family="sans-serif" font-size="20"><text x="40" y="126">01</text><text x="605" y="85">SEC</text><text x="610" y="467">24/7</text></g>
+</svg>

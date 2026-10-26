@@ -1,5 +1,6 @@
 <?php
-// Local MySQL configuration (XAMPP default). No database password.
+/** FABWEB local database settings — XAMPP defaults (no password). */
+declare(strict_types=1);
 $host = 'localhost';
 $user = 'root';
 $pwd = '';

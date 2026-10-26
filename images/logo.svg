@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="FABWEB shield">
+<defs><linearGradient id="a" x1="0" x2="1" y2="1"><stop stop-color="#4ce0d0"/><stop offset="1" stop-color="#048493"/></linearGradient></defs>
+<path d="M50 4 89 18v29c0 26-15 41-39 49C26 88 11 73 11 47V18Z" fill="url(#a)"/>
+<path d="M50 16 78 26v23c0 18-10 28-28 35-18-7-28-17-28-35V26Z" fill="#0a314e"/>
+<path d="M36 35h30v8H45v9h18v8H45v15h-9Z" fill="#fff"/>
+</svg>

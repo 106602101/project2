@@ -236,7 +236,6 @@ if ($conn instanceof mysqli) {
 // --------- Output ---------
 require __DIR__ . '/includes/header.inc';
 ?>
-
 <main id="main-content">
     <section class="section">
         <div class="container">

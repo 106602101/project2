@@ -16,6 +16,13 @@ function post_string($key) {
     return is_string($value) ? trim($value) : '';
 }
 
+function escapeHtml(string $value): string {
+    return htmlspecialchars(
+        $value,
+        ENT_QUOTES | ENT_SUBSTITUTE,
+        'UTF-8'
+    );
+}
 
 // ----------- Collect raw values -------------
 $raw = [
@@ -43,7 +50,7 @@ $validJobs     = [];
 require_once __DIR__ . '/settings.php';
 
 try {
-    mysqli_report(MYSQLI_REPORT_ERROR | MYSQL_REPORT_STRICT);
+    mysqli_report(MYSQLI_REPORT_ERROR);
     $conn = new mysqli($host, $user, $pwd, $sql_db);
     $conn->set_charset('utf8mb4');
 
@@ -157,168 +164,176 @@ if (mb_strlen($raw['other_skills'], 'UTF-8') > 5000) {
     $errors[] = 'Other skills must be under 5000 characters.';
 }
 
+// --------- Sanitise ------------
+$safe = sanitise($raw);
+$skillsJson = json_encode(array_values(array_unique($submittedSkills)));
+
+
+
 // PREVIOUS CODE
 
-// Job reference: exactly 6 alphanumeric characters.
-if (!preg_match('/^[A-Z0-9]{6}$/D', $data['jobref'])) {
-    $errors[] = 'Job reference must have 6 letters or numbers.';
-}
+// // Job reference: exactly 6 alphanumeric characters.
+// if (!preg_match('/^[A-Z0-9]{6}$/D', $data['jobref'])) {
+//     $errors[] = 'Job reference must have 6 letters or numbers.';
+// }
 
-// Existing positions in the Part 1 project.
-$validJobs = ['FW1001', 'FW1002', 'FW1003', 'FW1004'];
+// // Existing positions in the Part 1 project.
+// $validJobs = ['FW1001', 'FW1002', 'FW1003', 'FW1004'];
 
-if (preg_match('/^[A-Z0-9]{6}$/D', $data['jobref']) &&
-    !in_array($data['jobref'], $validJobs, true)) {
-    $errors[] = 'Please enter a valid FABWEB job reference.';
-}
+// if (preg_match('/^[A-Z0-9]{6}$/D', $data['jobref']) &&
+//     !in_array($data['jobref'], $validJobs, true)) {
+//     $errors[] = 'Please enter a valid FABWEB job reference.';
+// }
 
 
 
-// First and last names.
-foreach (['firstname' => 'First name',
-          'lastname' => 'Last name'] as $field => $label) {
-    if (!preg_match('/^[A-Za-z]{1,20}$/D', $data[$field])) {
-        $errors[] = "$label must contain 1-20 letters only.";
-    }
-}
+// // First and last names.
+// foreach (['firstname' => 'First name',
+//           'lastname' => 'Last name'] as $field => $label) {
+//     if (!preg_match('/^[A-Za-z]{1,20}$/D', $data[$field])) {
+//         $errors[] = "$label must contain 1-20 letters only.";
+//     }
+// }
 
-// Date of birth: dd/mm/yyyy.
-$dobForDatabase = null;
+// // Date of birth: dd/mm/yyyy.
+// $dobForDatabase = null;
 
-if (!preg_match(
-    '/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/D',
-    $data['dob'],
-    $matches
-)) {
-    $errors[] = 'Date of birth must be dd/mm/yyyy.';
-} else {
-    $day = (int)$matches[1];
-    $month = (int)$matches[2];
-    $year = (int)$matches[3];
+// if (!preg_match(
+//     '/^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/D',
+//     $data['dob'],
+//     $matches
+// )) {
+//     $errors[] = 'Date of birth must be dd/mm/yyyy.';
+// } else {
+//     $day = (int)$matches[1];
+//     $month = (int)$matches[2];
+//     $year = (int)$matches[3];
 
-    if (!checkdate($month, $day, $year)) {
-        $errors[] = 'Please enter a real date of birth.';
-    } else {
-        $dob = DateTimeImmutable::createFromFormat(
-            '!d/m/Y',
-            $data['dob']
-        );
+//     if (!checkdate($month, $day, $year)) {
+//         $errors[] = 'Please enter a real date of birth.';
+//     } else {
+//         $dob = DateTimeImmutable::createFromFormat(
+//             '!d/m/Y',
+//             $data['dob']
+//         );
 
-        if (!$dob || $dob > new DateTimeImmutable('today')) {
-            $errors[] = 'Date of birth cannot be in the future.';
-        } else {
-            $dobForDatabase = $dob->format('Y-m-d');
-        }
-    }
-}
+//         if (!$dob || $dob > new DateTimeImmutable('today')) {
+//             $errors[] = 'Date of birth cannot be in the future.';
+//         } else {
+//             $dobForDatabase = $dob->format('Y-m-d');
+//         }
+//     }
+// }
 
-// Validate radio-button value.
-if (!in_array(
-    $data['gender'],
-    ['female', 'male', 'other'],
-    true
-)) {
-    $errors[] = 'Please select a valid gender option.';
-}
+// // Validate radio-button value.
+// if (!in_array(
+//     $data['gender'],
+//     ['female', 'male', 'other'],
+//     true
+// )) {
+//     $errors[] = 'Please select a valid gender option.';
+// }
 
-// Address.
-foreach (['street' => 'Street address',
-          'suburb' => 'Suburb/town'] as $field => $label) {
-    $length = mb_strlen($data[$field], 'UTF-8');
+// // Address.
+// foreach (['street' => 'Street address',
+//           'suburb' => 'Suburb/town'] as $field => $label) {
+//     $length = mb_strlen($data[$field], 'UTF-8');
 
-    if ($length < 1 || $length > 40) {
-        $errors[] = "$label must contain 1-40 characters.";
-    }
-}
+//     if ($length < 1 || $length > 40) {
+//         $errors[] = "$label must contain 1-40 characters.";
+//     }
+// }
 
-// State or territory.
-$validStates = [
-    'VIC', 'NSW', 'QLD', 'NT',
-    'WA', 'SA', 'TAS', 'ACT'
-];
+// // State or territory.
+// $validStates = [
+//     'VIC', 'NSW', 'QLD', 'NT',
+//     'WA', 'SA', 'TAS', 'ACT'
+// ];
 
-if (!in_array($data['state'], $validStates, true)) {
-    $errors[] = 'Please select a valid state or territory.';
-}
+// if (!in_array($data['state'], $validStates, true)) {
+//     $errors[] = 'Please select a valid state or territory.';
+// }
 
-// Postcode: exactly 4 digits.
-if (!preg_match('/^[0-9]{4}$/D', $data['postcode'])) {
-    $errors[] = 'Postcode must contain exactly 4 digits.';
-}
+// // Postcode: exactly 4 digits.
+// if (!preg_match('/^[0-9]{4}$/D', $data['postcode'])) {
+//     $errors[] = 'Postcode must contain exactly 4 digits.';
+// }
 
-// Email address.
-if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL) ||
-    strlen($data['email']) > 254) {
-    $errors[] = 'Please enter a valid email address.';
-}
+// // Email address.
+// if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL) ||
+//     strlen($data['email']) > 254) {
+//     $errors[] = 'Please enter a valid email address.';
+// }
 
-// Phone number: 8 to 12 digits.
-if (!preg_match('/^[0-9]{8,12}$/D', $data['phone'])) {
-    $errors[] = 'Phone number must contain 8-12 digits.';
-}
+// // Phone number: 8 to 12 digits.
+// if (!preg_match('/^[0-9]{8,12}$/D', $data['phone'])) {
+//     $errors[] = 'Phone number must contain 8-12 digits.';
+// }
 
-// Validate submitted skills.
-$allowedSkills = [
-    'cybersecurity-fundamentals',
-    'network-security',
-    'incident-response',
-    'siem',
-    'web-security',
-    'penetration-testing',
-    'cloud-security',
-    'linux',
-    'scripting',
-    'risk-management',
-    'security-awareness',
-    'technical-documentation'
-];
+// // Validate submitted skills.
+// $allowedSkills = [
+//     'cybersecurity-fundamentals',
+//     'network-security',
+//     'incident-response',
+//     'siem',
+//     'web-security',
+//     'penetration-testing',
+//     'cloud-security',
+//     'linux',
+//     'scripting',
+//     'risk-management',
+//     'security-awareness',
+//     'technical-documentation'
+// ];
 
-$submittedSkills = $_POST['skills'] ?? [];
+// $submittedSkills = $_POST['skills'] ?? [];
 
-if (!is_array($submittedSkills)) {
-    $errors[] = 'Invalid skills format.';
-    $submittedSkills = [];
-}
+// if (!is_array($submittedSkills)) {
+//     $errors[] = 'Invalid skills format.';
+//     $submittedSkills = [];
+// }
 
-$submittedSkills = array_values(array_unique(
-    array_filter(
-        $submittedSkills,
-        fn($skill) => is_string($skill)
-    )
-));
+// $submittedSkills = array_values(array_unique(
+//     array_filter(
+//         $submittedSkills,
+//         fn($skill) => is_string($skill)
+//     )
+// ));
 
-if (empty($submittedSkills)) {
-    $errors[] = 'Please select at least one skill.';
-}
+// if (empty($submittedSkills)) {
+//     $errors[] = 'Please select at least one skill.';
+// }
 
-foreach ($submittedSkills as $skill) {
-    if (!in_array($skill, $allowedSkills, true)) {
-        $errors[] = 'An invalid skill was selected.';
-        break;
-    }
-}
+// foreach ($submittedSkills as $skill) {
+//     if (!in_array($skill, $allowedSkills, true)) {
+//         $errors[] = 'An invalid skill was selected.';
+//         break;
+//     }
+// }
 
-// Preserve the required checkbox from Part 1.
-if (!in_array(
-    'cybersecurity-fundamentals',
-    $submittedSkills,
-    true
-)) {
-    $errors[] = 'Cybersecurity Fundamentals is required.';
-}
+// // Preserve the required checkbox from Part 1.
+// if (!in_array(
+//     'cybersecurity-fundamentals',
+//     $submittedSkills,
+//     true
+// )) {
+//     $errors[] = 'Cybersecurity Fundamentals is required.';
+// }
 
-$skillsJson = json_encode($submittedSkills);
 
-if ($skillsJson === false) {
-    $errors[] = 'Unable to process the selected skills.';
-}
+// $skillsJson = json_encode($submittedSkills);
 
-if (mb_strlen($data['other_skills'], 'UTF-8') > 5000) {
-    $errors[] = 'Other skills must be under 5000 characters.';
-}
+// if ($skillsJson === false) {
+//     $errors[] = 'Unable to process the selected skills.';
+// }
 
-$eoiNumber = null;
-$databaseError = false;
+// if (mb_strlen($data['other_skills'], 'UTF-8') > 5000) {
+//     $errors[] = 'Other skills must be under 5000 characters.';
+// }
+
+
+// $eoiNumber = null;
+// $databaseError = false;
 
 // Only connect to the database if validation succeeds.
 if (empty($errors)) {

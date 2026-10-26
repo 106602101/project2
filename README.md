@@ -1,11 +1,9 @@
 # FABWEB — Applied Web Project Part 2
 
-**Submission folder:** `project2/` (case-sensitive)  
 **Database:** `fabweb_db`  
 **SQL export:** `fabweb_db.sql`  
 **Technology:** PHP 8+, MySQL/MariaDB, HTML, CSS. **No JavaScript.**
 
-This is a self-contained implementation based on the public FABWEB project structure at https://github.com/106602101/project2. The existing GitHub repository could be inspected but not directly cloned into the build environment. Therefore this package uses reconstructed styles and replacement SVG assets; it is **not** a byte-for-byte copy of the original project. Compare the seeded job descriptions, form fields, and group member contributions against your Part 1 website before submitting.
 
 ## Install on XAMPP / Windows
 
@@ -17,12 +15,7 @@ This is a self-contained implementation based on the public FABWEB project struc
 6. Open `http://localhost/project2/` and browse Home, Jobs, Apply and About.
 7. Open `http://localhost/project2/login.php` and sign in with **username: `admin` / password: `admin`**. The password is stored as a PHP password hash, not plain text.
 
-### Important content to update before submission
 
-- **`team_members`** in phpMyAdmin: replace both sample names, student IDs and contributions with the **real members** and accurate work in **Part 1** and **Part 2**. The names are deliberately not fabricated.
-- **`jobs`**: the four sample FABWEB cyber jobs are seeded for the complete working site. Check and update every field against the exact Part 1 job descriptions (salary, reporting line, employment, responsibilities, essential/preferable criteria). It is all loaded dynamically, so changes in MySQL appear automatically.
-- Verify the Part 1 application form fields against the form in `apply.php`. The current form uses standard EOI fields including job reference, full name, birth date, gender, address, state, postcode, email, phone and skill selections.
-- Site logo and hero graphic are self-contained SVG replacements. If keeping the original Part 1 visual design matters, copy your original site assets and reconcile CSS.
 
 ## Page routes
 
@@ -47,29 +40,6 @@ This is a self-contained implementation based on the public FABWEB project struc
 - `about_sections`: dynamically rendered company/about content.
 - `team_members`: member names, IDs and separate Part 1 / Part 2 contributions.
 
-## Assessment demonstration / manual test checklist
-
-1. Verify every internal link stays under `http://localhost/project2/`; all links to pages and assets use relative URLs.
-2. Open `process_eoi.php` directly using GET: it redirects to `apply.php` without inserting anything.
-3. Submit a complete EOI and record the automatically generated `EOInumber`. In phpMyAdmin, check it is saved in `eoi` with status **New**.
-4. Try blank names, invalid DOB, 3-digit postcode, invalid email, incorrect phone, unselected skills, malformed job ref, invalid job ref: server displays errors even with browser validation switched off.
-5. Search jobs by `cloud`, `FW1002`, etc. and confirm results are retrieved via SQL.
-6. Access `manage.php` logged out: it redirects to login. Log in with `admin` / `admin`.
-7. List all EOIs, filter by job ref, first name, last name and both names; sort by all provided fields (ascending/descending).
-8. Update one EOI status to **Current**, then **Final**; confirm the stored value in phpMyAdmin.
-9. Delete EOIs for a chosen job reference using the confirmation checkbox. Confirm other job references remain.
-10. Edit an `about_sections` row and a `team_members` contribution in phpMyAdmin; reload `about.php` and observe the change.
-11. Recheck that there is no `<script>` tag or JavaScript dependence anywhere in the site.
-
-## Security notes
-
-- MySQL credentials live in one location: `settings.php`, with a deliberately empty local DB password as specified.
-- All SQL **data** queries use prepared statements; SQL sort field and direction are chosen from explicit allowlists.
-- User input is stripped of dangerous tags/control characters, validated again in PHP, and HTML-escaped on output.
-- Destructive actions, logins and EOI submissions use CSRF tokens. Login regenerates the session ID and throttles repeated wrong passwords.
-- Default **admin/admin** credentials are included **only** to satisfy marker access. Do not deploy to the public Internet using this account. After marking, use `change_password.php` to set a stronger secret.
-- For a real production deployment, configure HTTPS, do not use the MySQL root account, and add privacy and retention controls for applicants' personal data.
-
 ## Project structure
 
 ```text
@@ -88,5 +58,3 @@ project2/
       grid.svg
   README.md
 ```
-
-You can edit all page files using VS Code or another plain-text editor.
